@@ -1,0 +1,133 @@
+/* Input Component Styles */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.input-field {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #1e293b;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.input-field::placeholder {
+  color: #94a3b8;
+}
+
+.input-field:disabled {
+  background-color: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+/* Input Variants */
+.input-field--default:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px #dbeafe;
+}
+
+.input-field--error {
+  border-color: #ef4444;
+}
+
+.input-field--error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px #fee2e2;
+}
+
+.input-field--success {
+  border-color: #10b981;
+}
+
+.input-field--success:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px #d1fae5;
+}
+
+.input-error {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #ef4444;
+}
+
+.input-help {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+/* Input Types */
+.input-field[type="date"] {
+  font-family: inherit;
+}
+
+.input-field[type="tel"] {
+  font-family: inherit;
+}
+
+.input-field[type="email"] {
+  font-family: inherit;
+}
+
+.input-field[type="password"] {
+  font-family: inherit;
+}
+
+/* Input Sizes */
+.input-field--sm {
+  padding: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.input-field--lg {
+  padding: 1.25rem;
+  font-size: 1.125rem;
+}
+
+/* Input with Icons */
+.input-with-icon {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+}
+
+.input-with-icon .input-field {
+  padding-left: 2.5rem;
+}
+
+.input-icon-right {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  cursor: pointer;
+}
+
+.input-with-icon-right .input-field {
+  padding-right: 2.5rem;
+} 
