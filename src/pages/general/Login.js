@@ -67,80 +67,77 @@ const Login = () => {
     }
   };
 
-  const backgroundStyle = {
-    minHeight: '100vh',
-    background: "url('/images/confirmation-deer.jpg') center center/cover no-repeat",
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  };
-
   return (
-    <div className="login-container" style={backgroundStyle}>
-      <div className="login-card">
-        <div className="login-header">
-          <h1 className="login-logo">Wild Welcome</h1>
-          <p className="login-subtitle">Welcome back! Please sign in to your account.</p>
+    <div className="login-container">
+      <div className="login-content">
+        <div className="login-card">
+          <div className="login-header">
+            <h1 className="login-logo">Wild Welcome</h1>
+            <p className="login-subtitle">Welcome back! Please sign in to your account.</p>
+          </div>
+
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className={`form-input ${errors.email ? 'error' : ''}`}
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+              />
+              {errors.email && <span className="error-message">{errors.email}</span>}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                className={`form-input ${errors.password ? 'error' : ''}`}
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+              />
+              {errors.password && <span className="error-message">{errors.password}</span>}
+            </div>
+
+            <div className="forgot-password">
+              <Link to="/forgot-password">Forgot your password?</Link>
+            </div>
+
+            <button 
+              type="submit" 
+              className="login-button"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+
+          <div className="divider">or continue with</div>
+
+          <div className="social-login">
+            <a href="#" className="social-button">
+              <span>🔍</span>
+              Google
+            </a>
+            <a href="#" className="social-button">
+              <span>📘</span>
+              Facebook
+            </a>
+          </div>
+
+          <div className="signup-link">
+            Don't have an account? <Link to="/signup">Sign up</Link>
+          </div>
         </div>
-
-        <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className={`form-input ${errors.email ? 'error' : ''}`}
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-            />
-            {errors.email && <span className="error-message">{errors.email}</span>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className={`form-input ${errors.password ? 'error' : ''}`}
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-            />
-            {errors.password && <span className="error-message">{errors.password}</span>}
-          </div>
-
-          <div className="forgot-password">
-            <Link to="/forgot-password">Forgot your password?</Link>
-          </div>
-
-          <button 
-            type="submit" 
-            className="login-button"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div className="divider">or continue with</div>
-
-        <div className="social-login">
-          <a href="#" className="social-button">
-            <span>🔍</span>
-            Google
-          </a>
-          <a href="#" className="social-button">
-            <span>📘</span>
-            Facebook
-          </a>
-        </div>
-
-        <div className="signup-link">
-          Don't have an account? <Link to="/signup">Sign up</Link>
+        
+        <div className="login-illustration">
+          <img src="/images/deer.jpg" alt="Deer illustration" />
         </div>
       </div>
     </div>

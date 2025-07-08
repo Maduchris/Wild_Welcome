@@ -1,13 +1,23 @@
 /* Sign Up 1.1 Page Styles */
-.signup11-container {
+.signup-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  background: linear-gradient(135deg, #EEC170 0%, #295135 100%);
 }
 
-.signup11-card {
+.signup-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.signup-card {
   background: #ffffff;
   border-radius: 1rem;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
@@ -15,6 +25,37 @@
   width: 100%;
   max-width: 600px;
   animation: slideUp 0.5s ease-out;
+}
+
+.signup11-illustration {
+  flex: 1;
+  max-width: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.signup11-illustration img {
+  width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+}
+
+@media (max-width: 768px) {
+  .signup-content {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .signup11-illustration {
+    order: -1;
+    max-width: 100%;
+  }
+  
+  .signup11-illustration img {
+    max-width: 400px;
+  }
 }
 
 @keyframes slideUp {
@@ -264,7 +305,7 @@
 }
 
 @media (max-width: 480px) {
-  .signup11-card {
+  .signup-card {
     padding: 2rem;
   }
 }
