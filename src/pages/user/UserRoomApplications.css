@@ -1,12 +1,12 @@
 /* User Room Applications Page Styles */
 .applications-container {
   min-height: 100vh;
-  background: #f8fafc;
+  background: #F9F7F3;
 }
 
 .applications-header {
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  background: #F9F7F3;
+  border-bottom: 1px solid #AFBE8E;
   padding: 1.5rem 0;
 }
 
@@ -22,7 +22,7 @@
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #295135;
 }
 
 .user-nav {
@@ -32,18 +32,18 @@
 }
 
 .nav-link {
-  color: #64748b;
+  color: #295135;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .nav-link:hover {
-  color: #3b82f6;
+  color: #EEC170;
 }
 
 .nav-link.active {
-  color: #3b82f6;
+  color: #EEC170;
 }
 
 .user-menu {
@@ -56,11 +56,11 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: #AFBE8E;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: #295135;
   font-weight: 600;
 }
 
@@ -73,12 +73,12 @@
 .page-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #295135;
   margin-bottom: 1rem;
 }
 
 .page-subtitle {
-  color: #64748b;
+  color: #86571F;
   margin-bottom: 2rem;
 }
 
@@ -86,14 +86,14 @@
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #AFBE8E;
 }
 
 .tab-button {
   padding: 0.75rem 1.5rem;
   border: none;
   background: none;
-  color: #64748b;
+  color: #295135;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -101,12 +101,12 @@
 }
 
 .tab-button:hover {
-  color: #3b82f6;
+  color: #EEC170;
 }
 
 .tab-button.active {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
+  color: #EEC170;
+  border-bottom-color: #EEC170;
 }
 
 .applications-grid {
@@ -115,16 +115,16 @@
 }
 
 .application-card {
-  background: #ffffff;
+  background: #F9F7F3;
   border-radius: 1rem;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  border: 1px solid #AFBE8E;
   transition: all 0.2s ease;
 }
 
 .application-card:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.08);
 }
 
 .application-header {
@@ -137,12 +137,12 @@
 .application-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #295135;
   margin-bottom: 0.5rem;
 }
 
 .application-location {
-  color: #64748b;
+  color: #86571F;
   font-size: 0.875rem;
 }
 
@@ -155,23 +155,23 @@
 }
 
 .status-pending {
-  background: #fef3c7;
-  color: #92400e;
+  background: #EEC170;
+  color: #86571F;
 }
 
 .status-approved {
-  background: #d1fae5;
-  color: #065f46;
+  background: #AFBE8E;
+  color: #295135;
 }
 
 .status-rejected {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #86571F;
+  color: #F9F7F3;
 }
 
 .status-withdrawn {
-  background: #f3f4f6;
-  color: #374151;
+  background: #F9F7F3;
+  color: #295135;
 }
 
 .application-details {
@@ -189,13 +189,13 @@
 
 .detail-label {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: #86571F;
   text-transform: uppercase;
   font-weight: 500;
 }
 
 .detail-value {
-  color: #374151;
+  color: #295135;
   font-weight: 500;
 }
 
@@ -220,38 +220,39 @@
 }
 
 .view-button {
-  background: #3b82f6;
-  color: #ffffff;
+  background: #EEC170;
+  color: #295135;
 }
 
 .view-button:hover {
-  background: #2563eb;
+  background: #AFBE8E;
 }
 
 .withdraw-button {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: #F9F7F3;
+  color: #295135;
+  border: 1px solid #AFBE8E;
 }
 
 .withdraw-button:hover {
-  background: #e5e7eb;
+  background: #EEC170;
 }
 
 .delete-button {
-  background: #fee2e2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
+  background: #86571F;
+  color: #F9F7F3;
+  border: 1px solid #EEC170;
 }
 
 .delete-button:hover {
-  background: #fecaca;
+  background: #EEC170;
+  color: #86571F;
 }
 
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  color: #64748b;
+  color: #86571F;
 }
 
 .empty-icon {
@@ -263,7 +264,7 @@
 .empty-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #374151;
+  color: #295135;
   margin-bottom: 0.5rem;
 }
 
@@ -272,8 +273,8 @@
 }
 
 .browse-button {
-  background: #3b82f6;
-  color: #ffffff;
+  background: #EEC170;
+  color: #295135;
   padding: 0.875rem 2rem;
   border: none;
   border-radius: 0.5rem;
@@ -284,7 +285,8 @@
 }
 
 .browse-button:hover {
-  background: #2563eb;
+  background: #AFBE8E;
+  color: #295135;
   transform: translateY(-1px);
 }
 
