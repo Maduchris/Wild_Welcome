@@ -3,7 +3,7 @@
 /* Landing Page */
 .landing-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #295135 0%, #AFBE8E 100%);
 }
 
 .landing-header {
@@ -20,7 +20,7 @@
 .landing-logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #F9F7F3;
 }
 
 .landing-nav {
@@ -30,7 +30,7 @@
 }
 
 .landing-nav-link {
-  color: #ffffff;
+  color: #F9F7F3;
   text-decoration: none;
   font-weight: 500;
   transition: opacity 0.2s ease;
@@ -58,14 +58,14 @@
 .hero-title {
   font-size: 3rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #F9F7F3;
   margin-bottom: 1.5rem;
   line-height: 1.2;
 }
 
 .hero-subtitle {
   font-size: 1.25rem;
-  color: #e2e8f0;
+  color: #AFBE8E;
   margin-bottom: 2rem;
   line-height: 1.6;
 }
@@ -80,19 +80,19 @@
   flex: 1;
   max-width: 500px;
   height: 400px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(249, 247, 243, 0.1);
   border-radius: 1rem;
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: #F9F7F3;
   font-size: 1.5rem;
 }
 
 .features-section {
   padding: 4rem 2rem;
-  background-color: #ffffff;
+  background-color: #F9F7F3;
 }
 
 .features-container {
@@ -104,7 +104,7 @@
   text-align: center;
   font-size: 2.25rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #295135;
   margin-bottom: 3rem;
 }
 
@@ -123,32 +123,32 @@
 .feature-icon {
   width: 80px;
   height: 80px;
-  background: #dbeafe;
+  background: #AFBE8E;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
   font-size: 1.5rem;
-  color: #2563eb;
+  color: #295135;
 }
 
 .feature-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #295135;
   margin-bottom: 1rem;
 }
 
 .feature-description {
-  color: #64748b;
+  color: #86571F;
   line-height: 1.6;
 }
 
 /* Login Page */
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #295135 0%, #AFBE8E 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,12 +168,12 @@
 .login-logo h1 {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #2563eb;
+  color: #295135;
   margin: 0;
 }
 
 .login-logo p {
-  color: #64748b;
+  color: #86571F;
   margin-top: 0.5rem;
 }
 
@@ -194,12 +194,12 @@
   content: '';
   flex: 1;
   height: 1px;
-  background-color: #e2e8f0;
+  background-color: #AFBE8E;
 }
 
 .login-divider span {
   padding: 0 1rem;
-  color: #64748b;
+  color: #86571F;
   font-size: 0.875rem;
 }
 
@@ -215,18 +215,18 @@
   justify-content: center;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #AFBE8E;
   border-radius: 0.5rem;
-  background-color: #ffffff;
-  color: #1e293b;
+  background-color: #F9F7F3;
+  color: #295135;
   font-weight: 500;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .social-button:hover {
-  background-color: #f8fafc;
-  border-color: #94a3b8;
+  background-color: #EEC170;
+  border-color: #86571F;
 }
 
 .login-footer {
@@ -235,12 +235,12 @@
 }
 
 .login-footer p {
-  color: #64748b;
+  color: #86571F;
   margin-bottom: 0.5rem;
 }
 
 .login-footer a {
-  color: #2563eb;
+  color: #295135;
   font-weight: 500;
   text-decoration: none;
 }
@@ -252,7 +252,7 @@
 .forgot-password {
   display: block;
   text-align: right;
-  color: #2563eb;
+  color: #295135;
   font-size: 0.875rem;
   text-decoration: none;
   margin-top: 0.5rem;
@@ -265,7 +265,7 @@
 /* Sign Up Page */
 .signup-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #295135 0%, #AFBE8E 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -285,12 +285,12 @@
 .signup-logo h1 {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #2563eb;
+  color: #295135;
   margin: 0;
 }
 
 .signup-logo p {
-  color: #64748b;
+  color: #86571F;
   margin-top: 0.5rem;
 }
 
@@ -303,24 +303,24 @@
 .user-type-button {
   flex: 1;
   padding: 1.5rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid #AFBE8E;
   border-radius: 0.5rem;
-  background-color: #ffffff;
-  color: #1e293b;
+  background-color: #F9F7F3;
+  color: #295135;
   font-weight: 500;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .user-type-button:hover {
-  border-color: #2563eb;
-  background-color: #dbeafe;
+  border-color: #295135;
+  background-color: #AFBE8E;
 }
 
 .user-type-button--selected {
-  border-color: #2563eb;
-  background-color: #dbeafe;
-  color: #2563eb;
+  border-color: #295135;
+  background-color: #AFBE8E;
+  color: #295135;
 }
 
 .signup-form {
@@ -336,7 +336,7 @@
 }
 
 .password-requirements {
-  background-color: #f8fafc;
+  background-color: #F9F7F3;
   border-radius: 0.5rem;
   padding: 1rem;
   margin-top: 0.5rem;
@@ -347,12 +347,12 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  color: #64748b;
+  color: #86571F;
   margin-bottom: 0.25rem;
 }
 
 .requirement--met {
-  color: #10b981;
+  color: #AFBE8E;
 }
 
 .requirement:last-child {
@@ -372,12 +372,12 @@
 
 .checkbox-label {
   font-size: 0.875rem;
-  color: #64748b;
+  color: #86571F;
   line-height: 1.4;
 }
 
 .checkbox-label a {
-  color: #2563eb;
+  color: #295135;
   text-decoration: none;
 }
 
@@ -391,12 +391,12 @@
 }
 
 .signup-footer p {
-  color: #64748b;
+  color: #86571F;
   margin-bottom: 0.5rem;
 }
 
 .signup-footer a {
-  color: #2563eb;
+  color: #295135;
   font-weight: 500;
   text-decoration: none;
 }
@@ -408,7 +408,7 @@
 /* Confirmation Page */
 .confirmation-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #295135 0%, #AFBE8E 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -417,72 +417,67 @@
 
 .confirmation-card {
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
+  text-align: center;
 }
 
 .success-icon {
   width: 80px;
   height: 80px;
-  background-color: #10b981;
+  background: #AFBE8E;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 2rem;
-  font-size: 1.875rem;
-  color: #ffffff;
+  font-size: 2rem;
+  color: #295135;
 }
 
 .confirmation-title {
-  text-align: center;
-  font-size: 1.875rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #F9F7F3;
   margin-bottom: 1rem;
 }
 
 .confirmation-subtitle {
-  text-align: center;
   font-size: 1.125rem;
-  color: #64748b;
+  color: #AFBE8E;
   margin-bottom: 2rem;
   line-height: 1.6;
 }
 
 .email-note {
-  background-color: #fef3c7;
-  border: 1px solid #f59e0b;
+  background: rgba(249, 247, 243, 0.1);
   border-radius: 0.5rem;
   padding: 1.5rem;
-  margin: 2rem 0;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
 }
 
 .email-note-title {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 600;
-  color: #d97706;
-  margin: 0 0 0.5rem 0;
+  color: #F9F7F3;
+  margin-bottom: 0.5rem;
 }
 
 .email-note-text {
-  font-size: 0.875rem;
-  color: #d97706;
-  margin: 0;
-  line-height: 1.5;
+  color: #AFBE8E;
+  line-height: 1.6;
 }
 
 .steps-container {
-  margin: 2rem 0;
+  margin-bottom: 2rem;
 }
 
 .step {
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  background-color: #f8fafc;
-  border-radius: 0.5rem;
-  margin-bottom: 1rem;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
 }
 
 .step:last-child {
@@ -492,14 +487,14 @@
 .step-number {
   width: 32px;
   height: 32px;
-  background-color: #2563eb;
-  color: #ffffff;
+  background: #EEC170;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 0.875rem;
+  font-weight: 600;
+  color: #295135;
+  flex-shrink: 0;
 }
 
 .step-content {
@@ -507,38 +502,36 @@
 }
 
 .step-title {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 600;
-  color: #1e293b;
-  margin: 0 0 0.25rem 0;
+  color: #F9F7F3;
+  margin-bottom: 0.25rem;
 }
 
 .step-description {
-  font-size: 0.875rem;
-  color: #64748b;
-  margin: 0;
+  color: #AFBE8E;
+  line-height: 1.6;
 }
 
 .countdown {
-  text-align: center;
-  margin: 1.5rem 0;
+  margin-bottom: 2rem;
 }
 
 .countdown p {
-  color: #64748b;
+  color: #AFBE8E;
   margin-bottom: 0.5rem;
 }
 
 .countdown strong {
-  color: #2563eb;
-  font-size: 1.125rem;
+  color: #EEC170;
+  font-size: 1.25rem;
 }
 
 .button-group {
   display: flex;
-  flex-direction: column;
   gap: 1rem;
-  margin-top: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 /* Responsive Design */
