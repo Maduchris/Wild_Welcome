@@ -1,57 +1,116 @@
-# Wild Welcome
+# Wild Welcome - Quick Start Guide
 
-## Description
-Wild Welcome will launch initially in Rwanda, capitalising on the country's strong track record in sustainable tourism and conservation. The platform will concentrate on areas surrounding Volcanoes National Park and Akagera National Park, key destinations that align with Rwanda's eco-tourism priorities. This strategic focus allows for a controlled pilot in a supportive regulatory and conservation environment, minimising entry risks and enabling refinement of the platform before broader expansion.
+A property rental platform for wildlife photographers and eco-tourists in Rwanda.
 
-In the long term, Wild Welcome aims to scale into other African regions with strong ecotourism and conservation potential. The platform's primary target users are wildlife photographers, both amateurs and professionals, who need affordable, well-equipped accommodations near prime wildlife areas. By focusing on this niche, Wild Welcome can tailor its offerings and build a passionate user community that supports both the platform and its mission. Secondary users include general eco-tourists and nature enthusiasts seeking sustainable, immersive travel.
+## Quick Start (Recommended)
 
-Technically, the project will begin with a Minimum Viable Product (MVP) that includes a user-friendly website and mobile-responsive interface, offering core features such as listings, bookings, communication tools, and initial conservation integrations. This phased approach supports lean testing, quick iteration, and efficient validation of both market interest and impact potential before scaling further.
+### 1. Backend Setup
+```bash
+cd backend
+cp .env.example .env
+# Edit .env with your configuration (see Configuration section)
+docker-compose up -d
+```
 
-## GitHub Repository
-[GitHub Repo Link](https://github.com/Maduchris/Wild_Welcome.git) <!-- Replace with your actual repo URL -->
+### 2. Frontend Setup
+```bash
+cd frontend
+npm install
+npm start
+```
 
-## Setup Instructions
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Maduchris/Wild_Welcome.git
-   cd wild-welcome
-   ```
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-3. **Start the development server:**
-   ```bash
-   npm start
-   ```
-4. **Open in your browser:**
-   Visit [http://localhost:3000](http://localhost:3000) to view the app.
+### 3. Access the Application
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
 
-## Designs
-Figma link: https://www.figma.com/design/p1X8TguvtYB7TzBJToymXc/Booking-Platform-Desktop-Design--Community-?node-id=2507-8904&t=a3nR8n34xJZJOs4X-1
-- The application features a modern, nature-inspired UI with a focus on usability and accessibility.
-- Animations are used for logo entry and image transitions to enhance user experience.
-- Color palette:
-  - Button: `#AFBE8E`
-  - Heading text: `#295135`
-  - Other text: `#000000`
-- Mockup images and logo are located in `src/assets/`.
-- Static HTML versions of each screen are available in the `landing/`, `login/`, `signup1/`, and `signup2/` folders for reference.
+## Manual Setup (Alternative)
 
-## Deployment Plan
-1. **MVP Launch:**
-   - Deploy the MVP to a cloud platform (e.g., Vercel, Netlify, or AWS Amplify) for public access.
-   - Ensure mobile responsiveness and cross-browser compatibility.
-   - Collect user feedback and monitor analytics for early validation.
-2. **Iterative Improvements:**
-   - Add new features based on user feedback and analytics.
-   - Expand listings and integrate more conservation-focused content.
-3. **Scaling:**
-   - Prepare for expansion into additional African regions with strong ecotourism potential.
-   - Optimize infrastructure for increased traffic and data.
+### Backend
+```bash
+cd backend
+pip install -r requirements.txt
+python run.py
+```
 
----
-For more details, see the codebase and design files, or contact the project maintainers.
-Video Demo: https://drive.google.com/file/d/1RFAW67gmDisYRZtIpVX2DkvhuiZyJ893/view?usp=sharing
+### Frontend
+```bash
+cd frontend
+npm install
+npm start
+```
 
-end.
+## Configuration
+
+Create `backend/.env` with:
+```env
+# Database
+MONGODB_URL=mongodb://admin:password@localhost:27017/wild_welcome?authSource=admin
+DATABASE_NAME=wild_welcome
+
+# JWT
+SECRET_KEY=your-super-secret-key-change-this-in-production
+
+# Cloudinary (required for image uploads)
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+
+# Email (Gmail SMTP)
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-app-password
+
+# SMS (Gupshup)
+GUPSHUP_API_KEY=your-gupshup-api-key
+GUPSHUP_APP_NAME=your-app-name
+```
+
+## Testing & Debugging
+
+### Backend Testing
+```bash
+cd backend
+# Check API health
+curl http://localhost:8000/api/health
+
+# View logs
+docker-compose logs -f backend
+
+# Access MongoDB
+docker exec -it wild_welcome_mongodb mongosh -u admin -p password
+```
+
+### Frontend Testing
+```bash
+cd frontend
+# Run tests
+npm test
+
+# Check for errors
+npm run build
+```
+
+### Common Issues
+
+1. **Backend won't start**: Check MongoDB connection and .env configuration
+2. **Frontend can't connect**: Verify backend is running on port 8000
+3. **Image uploads fail**: Check Cloudinary credentials in .env
+4. **Email/SMS not working**: Verify service credentials
+
+## Development Features
+
+- **User registration & authentication**
+- **Property search & booking**
+- **Image uploads (Cloudinary)**
+- **Email & SMS notifications**
+- **Landlord dashboard**
+- **Responsive design**
+
+## Service Setup (Optional)
+
+- **Cloudinary**: https://cloudinary.com (image storage)
+- **Gmail SMTP**: Enable 2FA + app password
+- **Gupshup SMS**: https://gupshup.io
+- **MongoDB Atlas**: https://cloud.mongodb.com (alternative to local)
+
+For detailed setup instructions, see `SETUP.md`.

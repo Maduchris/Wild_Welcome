@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:5.0
+    container_name: wild_welcome_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: wild_welcome
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - wild_welcome_network
+
+  backend:
+    build: .
+    container_name: wild_welcome_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URL=mongodb://admin:password@mongodb:27017/wild_welcome?authSource=admin
+      - DATABASE_NAME=wild_welcome
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    networks:
+      - wild_welcome_network
+
+volumes:
+  mongodb_data:
+
+networks:
+  wild_welcome_network:
+    driver: bridge
