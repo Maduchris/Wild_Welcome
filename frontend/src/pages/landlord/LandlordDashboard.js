@@ -1,74 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import Header from '../../components/ui/Header';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import ThemeToggle from '../../components/ui/ThemeToggle';
 
 const DashboardContainer = styled.div`
   min-height: 100vh;
   background-color: ${props => props.theme.colors.background};
-`;
-
-const Header = styled.header`
-  background-color: ${props => props.theme.colors.white};
-  border-bottom: 1px solid ${props => props.theme.colors.border};
-  padding: ${props => props.theme.spacing.lg} 0;
-  position: sticky;
-  top: 0;
-  z-index: ${props => props.theme.zIndex.sticky};
-`;
-
-const HeaderContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 ${props => props.theme.spacing.xl};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const Logo = styled(Link)`
-  font-size: ${props => props.theme.typography.fontSizes['2xl']};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
-  color: ${props => props.theme.colors.primary};
-  text-decoration: none;
-`;
-
-const Nav = styled.nav`
-  display: flex;
-  gap: ${props => props.theme.spacing.xl};
-  align-items: center;
-`;
-
-const NavLink = styled(Link)`
-  color: ${props => props.theme.colors.text};
-  text-decoration: none;
-  font-weight: ${props => props.theme.typography.fontWeights.medium};
-  transition: color ${props => props.theme.transitions.normal};
-  
-  &:hover {
-    color: ${props => props.theme.colors.primary};
-  }
-`;
-
-const UserMenu = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.md};
-`;
-
-const Avatar = styled.div`
-  width: 40px;
-  height: 40px;
-  background-color: ${props => props.theme.colors.primary};
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${props => props.theme.colors.white};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
 `;
 
 const MainContent = styled.main`
@@ -200,24 +140,21 @@ const BookingStatus = styled.span`
   font-weight: ${props => props.theme.typography.fontWeights.medium};
   background-color: ${props => {
     switch (props.status) {
-      case 'pending': return props.theme.colors.warningLight;
-      case 'approved': return props.theme.colors.successLight;
-      case 'rejected': return props.theme.colors.errorLight;
-      default: return props.theme.colors.gray[100];
+      case 'approved':
+        return props.theme.colors.success;
+      case 'pending':
+        return props.theme.colors.warning;
+      case 'rejected':
+        return props.theme.colors.error;
+      default:
+        return props.theme.colors.gray[500];
     }
   }};
-  color: ${props => {
-    switch (props.status) {
-      case 'pending': return props.theme.colors.warningDark;
-      case 'approved': return props.theme.colors.successDark;
-      case 'rejected': return props.theme.colors.errorDark;
-      default: return props.theme.colors.gray[600];
-    }
-  }};
+  color: ${props => props.theme.colors.white};
 `;
 
 const QuickActions = styled(Card)`
-  margin-bottom: ${props => props.theme.spacing.xl};
+  padding: ${props => props.theme.spacing.xl};
 `;
 
 const ActionButton = styled(Button)`
@@ -229,223 +166,179 @@ const ActionButton = styled(Button)`
   }
 `;
 
-const PropertyCard = styled(Card)`
-  margin-bottom: ${props => props.theme.spacing.lg};
+const RecentActivity = styled(Card)`
+  margin-top: ${props => props.theme.spacing.xl};
 `;
 
-const PropertyImage = styled.div`
-  width: 100%;
-  height: 150px;
-  background-color: ${props => props.theme.colors.gray[200]};
-  border-radius: ${props => props.theme.borderRadius.md};
-  margin-bottom: ${props => props.theme.spacing.lg};
+const ActivityItem = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: ${props => props.theme.spacing.md};
+  padding: ${props => props.theme.spacing.md};
+  border-bottom: 1px solid ${props => props.theme.colors.borderLight};
+  
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const ActivityIcon = styled.div`
+  width: 32px;
+  height: 32px;
+  background-color: ${props => props.theme.colors.primaryLight};
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${props => props.theme.colors.gray[500]};
-  font-size: ${props => props.theme.typography.fontSizes['2xl']};
-`;
-
-const PropertyTitle = styled.h4`
-  font-size: ${props => props.theme.typography.fontSizes.lg};
-  font-weight: ${props => props.theme.typography.fontWeights.semibold};
-  color: ${props => props.theme.colors.text};
-  margin: 0 0 ${props => props.theme.spacing.sm} 0;
-`;
-
-const PropertyLocation = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
   font-size: ${props => props.theme.typography.fontSizes.sm};
-  margin: 0 0 ${props => props.theme.spacing.md} 0;
-`;
-
-const PropertyStats = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const PropertyPrice = styled.span`
-  font-size: ${props => props.theme.typography.fontSizes.lg};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
   color: ${props => props.theme.colors.primary};
+  flex-shrink: 0;
 `;
 
-const PropertyOccupancy = styled.span`
+const ActivityContent = styled.div`
+  flex: 1;
+`;
+
+const ActivityText = styled.p`
   font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.theme.colors.text};
+  margin: 0 0 ${props => props.theme.spacing.xs} 0;
+`;
+
+const ActivityTime = styled.span`
+  font-size: ${props => props.theme.typography.fontSizes.xs};
   color: ${props => props.theme.colors.textSecondary};
 `;
 
 const LandlordDashboard = () => {
   const [stats, setStats] = useState({
-    totalProperties: 0,
-    activeBookings: 0,
-    monthlyRevenue: 0,
-    occupancyRate: 0,
+    totalProperties: 12,
+    occupiedUnits: 8,
+    availableUnits: 4,
+    totalRevenue: 45000,
+    pendingBookings: 3,
+    maintenanceRequests: 2
   });
 
-  const [recentBookings, setRecentBookings] = useState([]);
-  const [properties, setProperties] = useState([]);
-
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setStats({
-        totalProperties: 8,
-        activeBookings: 12,
-        monthlyRevenue: 15600,
-        occupancyRate: 85,
-      });
-
-      setRecentBookings([
+  const [recentBookings, setRecentBookings] = useState([
         {
           id: 1,
-          tenant: 'John Doe',
-          property: 'Downtown Studio',
-          date: '2024-01-15',
-          status: 'pending',
+      tenant: 'John Smith',
+      property: 'Cozy Studio in Kigali City Center',
+      date: '2024-02-15',
+      status: 'approved',
+      amount: 120
         },
         {
           id: 2,
-          tenant: 'Jane Smith',
-          property: 'Brooklyn Apartment',
-          date: '2024-01-14',
-          status: 'approved',
+      tenant: 'Sarah Johnson',
+      property: 'Modern 2BR Apartment in Remera',
+      date: '2024-02-14',
+      status: 'pending',
+      amount: 280
         },
         {
           id: 3,
-          tenant: 'Mike Johnson',
-          property: 'Manhattan Loft',
-          date: '2024-01-13',
+      tenant: 'Mike Wilson',
+      property: 'Luxury Suite in Nyarutarama',
+      date: '2024-02-13',
           status: 'rejected',
-        },
+      amount: 450
+    }
       ]);
 
-      setProperties([
+  const [recentActivity, setRecentActivity] = useState([
         {
           id: 1,
-          title: 'Downtown Studio',
-          location: 'Downtown, New York',
-          price: 1200,
-          occupancy: 'Occupied',
-          image: '🏠',
+      type: 'booking',
+      text: 'New booking request from John Smith',
+      time: '2 hours ago'
         },
         {
           id: 2,
-          title: 'Brooklyn Apartment',
-          location: 'Brooklyn Heights',
-          price: 2100,
-          occupancy: 'Available',
-          image: '🏢',
-        },
-      ]);
-    }, 1000);
-  }, []);
+      type: 'maintenance',
+      text: 'Maintenance request submitted for Unit 3B',
+      time: '4 hours ago'
+    },
+    {
+      id: 3,
+      type: 'payment',
+      text: 'Rent payment received from Sarah Johnson',
+      time: '1 day ago'
+    },
+    {
+      id: 4,
+      type: 'booking',
+      text: 'Booking approved for Mike Wilson',
+      time: '2 days ago'
+    }
+  ]);
 
   return (
     <DashboardContainer>
-      <Header>
-        <HeaderContent>
-          <Logo to="/landlord/dashboard">
-            <img src="/images/wild-welcome-logo.png" alt="Wild Welcome Logo" style={{ height: '28px', width: 'auto' }} />
-          </Logo>
-          <Nav>
-            <NavLink to="/landlord/properties">Properties</NavLink>
-            <NavLink to="/landlord/calendar">Calendar</NavLink>
-            <NavLink to="/landlord/booking-request">Bookings</NavLink>
-            <NavLink to="/landlord/account">Account</NavLink>
-          </Nav>
-          <UserMenu>
-            <ThemeToggle />
-            <Avatar>LL</Avatar>
-          </UserMenu>
-        </HeaderContent>
-      </Header>
+      <Header userType="landlord" userInitials="LS" />
 
       <MainContent>
         <WelcomeSection>
-          <WelcomeTitle>Welcome back, Landlord!</WelcomeTitle>
+          <WelcomeTitle>Welcome back, Sarah!</WelcomeTitle>
           <WelcomeSubtitle>
             Here's what's happening with your properties today.
           </WelcomeSubtitle>
         </WelcomeSection>
 
         <StatsGrid>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
             <StatCard>
-              <StatIcon iconColor="#dbeafe" iconTextColor="#2563eb">🏠</StatIcon>
+            <StatIcon iconColor="#d1fae5" iconTextColor="#059669">
+              🏠
+            </StatIcon>
               <StatNumber>{stats.totalProperties}</StatNumber>
               <StatLabel>Total Properties</StatLabel>
             </StatCard>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
             <StatCard>
-              <StatIcon iconColor="#d1fae5" iconTextColor="#10b981">📅</StatIcon>
-              <StatNumber>{stats.activeBookings}</StatNumber>
-              <StatLabel>Active Bookings</StatLabel>
+            <StatIcon iconColor="#dbeafe" iconTextColor="#2563eb">
+              👥
+            </StatIcon>
+            <StatNumber>{stats.occupiedUnits}</StatNumber>
+            <StatLabel>Occupied Units</StatLabel>
             </StatCard>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
             <StatCard>
-              <StatIcon iconColor="#fef3c7" iconTextColor="#f59e0b">💰</StatIcon>
-              <StatNumber>${stats.monthlyRevenue.toLocaleString()}</StatNumber>
-              <StatLabel>Monthly Revenue</StatLabel>
+            <StatIcon iconColor="#fef3c7" iconTextColor="#d97706">
+              🔓
+            </StatIcon>
+            <StatNumber>{stats.availableUnits}</StatNumber>
+            <StatLabel>Available Units</StatLabel>
             </StatCard>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
             <StatCard>
-              <StatIcon iconColor="#fee2e2" iconTextColor="#ef4444">📊</StatIcon>
-              <StatNumber>{stats.occupancyRate}%</StatNumber>
-              <StatLabel>Occupancy Rate</StatLabel>
+            <StatIcon iconColor="#f3e8ff" iconTextColor="#7c3aed">
+              💰
+            </StatIcon>
+            <StatNumber>${stats.totalRevenue.toLocaleString()}</StatNumber>
+            <StatLabel>Monthly Revenue</StatLabel>
             </StatCard>
-          </motion.div>
         </StatsGrid>
 
         <ContentGrid>
           <div>
             <RecentBookings>
               <SectionTitle>Recent Booking Requests</SectionTitle>
-              {recentBookings.map((booking, index) => (
-                <motion.div
-                  key={booking.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                >
-                  <BookingItem>
+              {recentBookings.map(booking => (
+                <BookingItem key={booking.id}>
                     <BookingAvatar>
                       {booking.tenant.split(' ').map(n => n[0]).join('')}
                     </BookingAvatar>
                     <BookingInfo>
                       <BookingTitle>{booking.tenant}</BookingTitle>
                       <BookingDetails>
-                        {booking.property} • {new Date(booking.date).toLocaleDateString()}
+                      {booking.property} • ${booking.amount}/month
                       </BookingDetails>
                     </BookingInfo>
                     <BookingStatus status={booking.status}>
-                      {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                    {booking.status}
                     </BookingStatus>
                   </BookingItem>
-                </motion.div>
               ))}
             </RecentBookings>
           </div>
@@ -453,36 +346,44 @@ const LandlordDashboard = () => {
           <div>
             <QuickActions>
               <SectionTitle>Quick Actions</SectionTitle>
-              <ActionButton as={Link} to="/landlord/add-room">
-                Add New Room
-              </ActionButton>
-              <ActionButton as={Link} to="/landlord/add-apartment" variant="outline">
-                Add New Apartment
-              </ActionButton>
-              <ActionButton as={Link} to="/landlord/booking-request" variant="outline">
-                View All Bookings
-              </ActionButton>
+              <Link to="/landlord/add-property" style={{ textDecoration: 'none' }}>
+                <ActionButton variant="primary">
+                  Add New Property
+                </ActionButton>
+              </Link>
+              <Link to="/landlord/booking-request" style={{ textDecoration: 'none' }}>
+                <ActionButton variant="outline">
+                  View All Bookings
+                </ActionButton>
+              </Link>
+              <Link to="/landlord/properties" style={{ textDecoration: 'none' }}>
+                <ActionButton variant="outline">
+                  Manage Properties
+                </ActionButton>
+              </Link>
+              <Link to="/landlord/calendar" style={{ textDecoration: 'none' }}>
+                <ActionButton variant="outline">
+                  View Calendar
+                </ActionButton>
+              </Link>
             </QuickActions>
 
-            <SectionTitle>Your Properties</SectionTitle>
-            {properties.map((property, index) => (
-              <motion.div
-                key={property.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
-                <PropertyCard>
-                  <PropertyImage>{property.image}</PropertyImage>
-                  <PropertyTitle>{property.title}</PropertyTitle>
-                  <PropertyLocation>{property.location}</PropertyLocation>
-                  <PropertyStats>
-                    <PropertyPrice>${property.price}/month</PropertyPrice>
-                    <PropertyOccupancy>{property.occupancy}</PropertyOccupancy>
-                  </PropertyStats>
-                </PropertyCard>
-              </motion.div>
-            ))}
+            <RecentActivity>
+              <SectionTitle>Recent Activity</SectionTitle>
+              {recentActivity.map(activity => (
+                <ActivityItem key={activity.id}>
+                  <ActivityIcon>
+                    {activity.type === 'booking' && '📋'}
+                    {activity.type === 'maintenance' && '🔧'}
+                    {activity.type === 'payment' && '💰'}
+                  </ActivityIcon>
+                  <ActivityContent>
+                    <ActivityText>{activity.text}</ActivityText>
+                    <ActivityTime>{activity.time}</ActivityTime>
+                  </ActivityContent>
+                </ActivityItem>
+              ))}
+            </RecentActivity>
           </div>
         </ContentGrid>
       </MainContent>

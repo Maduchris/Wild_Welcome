@@ -1,335 +1,572 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './LandlordBookingRequest.css';
+import styled from 'styled-components';
+import Header from '../../components/ui/Header';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+
+const BookingRequestContainer = styled.div`
+  min-height: 100vh;
+  background-color: ${props => props.theme.colors.background};
+`;
+
+const MainContent = styled.main`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: ${props => props.theme.spacing.xl};
+`;
+
+const PageHeader = styled.div`
+  margin-bottom: ${props => props.theme.spacing.xxxl};
+`;
+
+const PageTitle = styled.h1`
+  font-size: ${props => props.theme.typography.fontSizes['3xl']};
+  font-weight: ${props => props.theme.typography.fontWeights.bold};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.sm};
+`;
+
+const PageSubtitle = styled.p`
+  font-size: ${props => props.theme.typography.fontSizes.lg};
+  color: ${props => props.theme.colors.textSecondary};
+`;
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: ${props => props.theme.spacing.xl};
+  margin-bottom: ${props => props.theme.spacing.xxxl};
+`;
+
+const StatCard = styled(Card)`
+  text-align: center;
+  padding: ${props => props.theme.spacing.xl};
+  transition: transform ${props => props.theme.transitions.normal};
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+const StatIcon = styled.div`
+  width: 60px;
+  height: 60px;
+  background-color: ${props => props.iconColor || props.theme.colors.primaryLight};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto ${props => props.theme.spacing.lg};
+  font-size: ${props => props.theme.typography.fontSizes.xl};
+  color: ${props => props.theme.colors.white};
+`;
+
+const StatNumber = styled.div`
+  font-size: ${props => props.theme.typography.fontSizes['3xl']};
+  font-weight: ${props => props.theme.typography.fontWeights.bold};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.sm};
+`;
+
+const StatLabel = styled.p`
+  color: ${props => props.theme.colors.textSecondary};
+  font-size: ${props => props.theme.typography.fontSizes.base};
+  margin: 0 0 ${props => props.theme.spacing.sm} 0;
+`;
+
+const StatChange = styled.div`
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.isPositive ? props.theme.colors.success : props.theme.colors.error};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+`;
+
+const ContentGrid = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: ${props => props.theme.spacing.xl};
+  
+  @media (max-width: ${props => props.theme.breakpoints.lg}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const BookingList = styled(Card)`
+  padding: ${props => props.theme.spacing.xl};
+`;
+
+const SectionTitle = styled.h2`
+  font-size: ${props => props.theme.typography.fontSizes.xl};
+  font-weight: ${props => props.theme.typography.fontWeights.semibold};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.lg};
+`;
+
+const FilterBar = styled.div`
+  display: flex;
+  gap: ${props => props.theme.spacing.md};
+  margin-bottom: ${props => props.theme.spacing.lg};
+  flex-wrap: wrap;
+`;
+
+const FilterButton = styled.button`
+  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
+  border: 1px solid ${props => props.isActive ? props.theme.colors.primary : props.theme.colors.border};
+  background: ${props => props.isActive ? props.theme.colors.primary : 'transparent'};
+  color: ${props => props.isActive ? props.theme.colors.white : props.theme.colors.text};
+  border-radius: ${props => props.theme.borderRadius.md};
+  cursor: pointer;
+  transition: all ${props => props.theme.transitions.normal};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  
+  &:hover {
+    background: ${props => props.isActive ? props.theme.colors.primary : props.theme.colors.surface};
+    border-color: ${props => props.theme.colors.primary};
+  }
+`;
+
+const BookingItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing.lg};
+  padding: ${props => props.theme.spacing.lg};
+  border-bottom: 1px solid ${props => props.theme.colors.borderLight};
+  transition: background-color ${props => props.theme.transitions.normal};
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background-color: ${props => props.theme.colors.surface};
+  }
+`;
+
+const BookingAvatar = styled.div`
+  width: 50px;
+  height: 50px;
+  background-color: ${props => props.theme.colors.primaryLight};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: ${props => props.theme.typography.fontWeights.bold};
+  color: ${props => props.theme.colors.white};
+  flex-shrink: 0;
+`;
+
+const BookingInfo = styled.div`
+  flex: 1;
+`;
+
+const BookingTitle = styled.h4`
+  font-size: ${props => props.theme.typography.fontSizes.base};
+  font-weight: ${props => props.theme.typography.fontWeights.semibold};
+  color: ${props => props.theme.colors.text};
+  margin: 0 0 ${props => props.theme.spacing.xs} 0;
+`;
+
+const BookingDetails = styled.p`
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.theme.colors.textSecondary};
+  margin: 0 0 ${props => props.theme.spacing.xs} 0;
+`;
+
+const BookingDate = styled.span`
+  font-size: ${props => props.theme.typography.fontSizes.xs};
+  color: ${props => props.theme.colors.textSecondary};
+`;
+
+const BookingStatus = styled.span`
+  padding: ${props => props.theme.spacing.xs} ${props => props.theme.spacing.sm};
+  border-radius: ${props => props.theme.borderRadius.sm};
+  font-size: ${props => props.theme.typography.fontSizes.xs};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  background-color: ${props => {
+    switch (props.status) {
+      case 'approved':
+        return props.theme.colors.success;
+      case 'pending':
+        return props.theme.colors.warning;
+      case 'rejected':
+        return props.theme.colors.error;
+      default:
+        return props.theme.colors.gray[500];
+    }
+  }};
+  color: ${props => props.theme.colors.white};
+`;
+
+const BookingActions = styled.div`
+  display: flex;
+  gap: ${props => props.theme.spacing.sm};
+`;
+
+const ActionButton = styled(Button)`
+  padding: ${props => props.theme.spacing.xs} ${props => props.theme.spacing.sm};
+  font-size: ${props => props.theme.typography.fontSizes.xs};
+`;
+
+const Sidebar = styled.div``;
+
+const QuickActions = styled(Card)`
+  padding: ${props => props.theme.spacing.xl};
+  margin-bottom: ${props => props.theme.spacing.xl};
+`;
+
+const ActionItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing.md};
+  padding: ${props => props.theme.spacing.md};
+  border-radius: ${props => props.theme.borderRadius.md};
+  cursor: pointer;
+  transition: background-color ${props => props.theme.transitions.normal};
+  
+  &:hover {
+    background-color: ${props => props.theme.colors.surface};
+  }
+`;
+
+const ActionIcon = styled.div`
+  width: 40px;
+  height: 40px;
+  background-color: ${props => props.theme.colors.primaryLight};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${props => props.theme.colors.white};
+  font-size: ${props => props.theme.typography.fontSizes.lg};
+`;
+
+const ActionText = styled.div``;
+
+const ActionTitle = styled.h4`
+  font-size: ${props => props.theme.typography.fontSizes.base};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  color: ${props => props.theme.colors.text};
+  margin: 0 0 ${props => props.theme.spacing.xs} 0;
+`;
+
+const ActionDescription = styled.p`
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.theme.colors.textSecondary};
+  margin: 0;
+`;
+
+const RecentActivity = styled(Card)`
+  padding: ${props => props.theme.spacing.xl};
+`;
+
+const ActivityItem = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: ${props => props.theme.spacing.md};
+  padding: ${props => props.theme.spacing.md};
+  border-bottom: 1px solid ${props => props.theme.colors.borderLight};
+  
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const ActivityIcon = styled.div`
+  width: 32px;
+  height: 32px;
+  background-color: ${props => props.theme.colors.primaryLight};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.theme.colors.white};
+  flex-shrink: 0;
+`;
+
+const ActivityContent = styled.div`
+  flex: 1;
+`;
+
+const ActivityText = styled.p`
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.theme.colors.text};
+  margin: 0 0 ${props => props.theme.spacing.xs} 0;
+`;
+
+const ActivityTime = styled.span`
+  font-size: ${props => props.theme.typography.fontSizes.xs};
+  color: ${props => props.theme.colors.textSecondary};
+`;
 
 const LandlordBookingRequest = () => {
-  const [filters, setFilters] = useState({
-    status: '',
-    property: '',
-    dateRange: ''
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [stats] = useState({
+    total: 15,
+    pending: 8,
+    approved: 5,
+    rejected: 2
   });
 
-  const bookingRequests = [
+  const [bookings] = useState([
     {
       id: 1,
-      title: "Booking Request from John Smith",
-      property: "Cozy Studio in Downtown",
-      status: "pending",
-      applicant: {
-        name: "John Smith",
-        email: "john.smith@email.com",
-        phone: "+1 (555) 123-4567",
-        avatar: "JS",
-        rating: 4.8,
-        applications: 3,
-        verified: true
-      },
-      moveInDate: "2024-02-15",
-      duration: "12 months",
-      rent: "$1,200/month",
-      message: "I'm a graduate student looking for a quiet place to study. I have excellent references and can provide proof of income."
+      tenant: 'John Smith',
+      property: 'Cozy Studio in Kigali City Center',
+      date: '2024-02-15',
+      status: 'pending',
+      amount: 120,
+      moveInDate: '2024-03-01'
     },
     {
       id: 2,
-      title: "Booking Request from Sarah Johnson",
-      property: "Modern 2BR Apartment",
-      status: "approved",
-      applicant: {
-        name: "Sarah Johnson",
-        email: "sarah.j@email.com",
-        phone: "+1 (555) 987-6543",
-        avatar: "SJ",
-        rating: 4.9,
-        applications: 1,
-        verified: true
-      },
-      moveInDate: "2024-02-01",
-      duration: "6 months",
-      rent: "$1,800/month",
-      message: "I'm a young professional working downtown. I'm quiet, clean, and always pay rent on time."
+      tenant: 'Sarah Johnson',
+      property: 'Modern 2BR Apartment in Remera',
+      date: '2024-02-14',
+      status: 'approved',
+      amount: 280,
+      moveInDate: '2024-02-28'
     },
     {
       id: 3,
-      title: "Booking Request from Mike Wilson",
-      property: "Luxury Penthouse Suite",
-      status: "rejected",
-      applicant: {
-        name: "Mike Wilson",
-        email: "mike.w@email.com",
-        phone: "+1 (555) 456-7890",
-        avatar: "MW",
-        rating: 3.2,
-        applications: 5,
-        verified: false
-      },
-      moveInDate: "2024-03-01",
-      duration: "24 months",
-      rent: "$2,500/month",
-      message: "Looking for a long-term rental. I have a small dog and work from home."
+      tenant: 'Mike Wilson',
+      property: 'Luxury Suite in Nyarutarama',
+      date: '2024-02-13',
+      status: 'rejected',
+      amount: 450,
+      moveInDate: '2024-03-15'
+    },
+    {
+      id: 4,
+      tenant: 'Emily Davis',
+      property: 'Shared Room Near University',
+      date: '2024-02-12',
+      status: 'pending',
+      amount: 90,
+      moveInDate: '2024-02-25'
+    },
+    {
+      id: 5,
+      tenant: 'David Brown',
+      property: 'Garden View Apartment in Gisozi',
+      date: '2024-02-11',
+      status: 'approved',
+      amount: 200,
+      moveInDate: '2024-03-01'
     }
-  ];
+  ]);
 
-  const stats = [
+  const [recentActivity] = useState([
     {
-      title: "Total Requests",
-      value: "15",
-      change: "+3",
-      changeType: "positive",
-      icon: "📋",
-      color: "blue"
+      id: 1,
+      type: 'booking',
+      text: 'New booking request from John Smith',
+      time: '2 hours ago'
     },
     {
-      title: "Pending",
-      value: "8",
-      change: "+2",
-      changeType: "positive",
-      icon: "⏳",
-      color: "orange"
+      id: 2,
+      type: 'approval',
+      text: 'Booking approved for Sarah Johnson',
+      time: '4 hours ago'
     },
     {
-      title: "Approved",
-      value: "5",
-      change: "+1",
-      changeType: "positive",
-      icon: "✅",
-      color: "green"
+      id: 3,
+      type: 'rejection',
+      text: 'Booking rejected for Mike Wilson',
+      time: '1 day ago'
     },
     {
-      title: "Rejected",
-      value: "2",
-      change: "0",
-      changeType: "neutral",
-      icon: "❌",
-      color: "red"
+      id: 4,
+      type: 'booking',
+      text: 'New booking request from Emily Davis',
+      time: '2 days ago'
     }
-  ];
+  ]);
 
-  const getStatusDisplay = (status) => {
-    const statusMap = {
-      pending: { label: 'Pending Review', class: 'status-pending' },
-      approved: { label: 'Approved', class: 'status-approved' },
-      rejected: { label: 'Rejected', class: 'status-rejected' }
-    };
-    return statusMap[status] || { label: 'Unknown', class: 'status-pending' };
+  const filteredBookings = activeFilter === 'all' 
+    ? bookings 
+    : bookings.filter(booking => booking.status === activeFilter);
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'approved':
+        return '#198754';
+      case 'pending':
+        return '#FFC107';
+      case 'rejected':
+        return '#DC3545';
+      default:
+        return '#6C757D';
+    }
   };
 
-  const filteredRequests = bookingRequests.filter(request => {
-    if (filters.status && request.status !== filters.status) return false;
-    if (filters.property && !request.property.toLowerCase().includes(filters.property.toLowerCase())) return false;
-    return true;
-  });
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleApprove = (requestId) => {
-    console.log('Approving request:', requestId);
-    // Handle approval logic
-  };
-
-  const handleReject = (requestId) => {
-    console.log('Rejecting request:', requestId);
-    // Handle rejection logic
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'approved':
+        return '✓';
+      case 'pending':
+        return '⏳';
+      case 'rejected':
+        return '✗';
+      default:
+        return '📋';
+    }
   };
 
   return (
-    <div className="booking-request-container">
-      <header className="booking-request-header">
-        <div className="header-content">
-          <div className="logo">Wild Welcome</div>
-          <nav className="landlord-nav">
-            <Link to="/landlord/dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/landlord/properties" className="nav-link">Properties</Link>
-            <Link to="/landlord/calendar" className="nav-link">Calendar</Link>
-            <Link to="/landlord/bookings" className="nav-link active">Bookings</Link>
-            <Link to="/landlord/account" className="nav-link">Account</Link>
-          </nav>
-          <div className="user-menu">
-            <div className="user-avatar">LS</div>
-          </div>
-        </div>
-      </header>
+    <BookingRequestContainer>
+      <Header userType="landlord" userInitials="LS" />
+      
+      <MainContent>
+        <PageHeader>
+          <PageTitle>Booking Requests</PageTitle>
+          <PageSubtitle>
+            Manage and review all incoming booking requests from potential tenants.
+          </PageSubtitle>
+        </PageHeader>
 
-      <div className="booking-request-content">
-        <div className="page-header">
-          <h1 className="page-title">Booking Requests</h1>
-        </div>
+        <StatsGrid>
+          <StatCard>
+            <StatIcon iconColor="#6C757D">📋</StatIcon>
+            <StatNumber>{stats.total}</StatNumber>
+            <StatLabel>Total Requests</StatLabel>
+            <StatChange isPositive={true}>+3 from last week</StatChange>
+          </StatCard>
+          
+          <StatCard>
+            <StatIcon iconColor="#FFC107">⏳</StatIcon>
+            <StatNumber>{stats.pending}</StatNumber>
+            <StatLabel>Pending</StatLabel>
+            <StatChange isPositive={true}>+2 from last week</StatChange>
+          </StatCard>
+          
+          <StatCard>
+            <StatIcon iconColor="#198754">✓</StatIcon>
+            <StatNumber>{stats.approved}</StatNumber>
+            <StatLabel>Approved</StatLabel>
+            <StatChange isPositive={true}>+1 from last week</StatChange>
+          </StatCard>
+          
+          <StatCard>
+            <StatIcon iconColor="#DC3545">✗</StatIcon>
+            <StatNumber>{stats.rejected}</StatNumber>
+            <StatLabel>Rejected</StatLabel>
+            <StatChange isPositive={false}>-1 from last week</StatChange>
+          </StatCard>
+        </StatsGrid>
 
-        <div className="booking-stats">
-          {stats.map((stat, index) => (
-            <div key={index} className="stat-card">
-              <div className="stat-header">
-                <span className="stat-title">{stat.title}</span>
-                <div className={`stat-icon ${stat.color}`}>
-                  {stat.icon}
-                </div>
-              </div>
-              <div className="stat-value">{stat.value}</div>
-              <div className={`stat-change ${stat.changeType}`}>
-                {stat.changeType === 'positive' && '+'}
-                {stat.change} from last week
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="booking-filters">
-          <h3 className="filters-title">Filters</h3>
-          <div className="filters-row">
-            <div className="filter-group">
-              <label className="filter-label">Status</label>
-              <select
-                name="status"
-                className="filter-select"
-                value={filters.status}
-                onChange={handleFilterChange}
+        <ContentGrid>
+          <BookingList>
+            <SectionTitle>Recent Booking Requests</SectionTitle>
+            
+            <FilterBar>
+              <FilterButton 
+                isActive={activeFilter === 'all'}
+                onClick={() => setActiveFilter('all')}
               >
-                <option value="">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label className="filter-label">Property</label>
-              <select
-                name="property"
-                className="filter-select"
-                value={filters.property}
-                onChange={handleFilterChange}
+                All ({bookings.length})
+              </FilterButton>
+              <FilterButton 
+                isActive={activeFilter === 'pending'}
+                onClick={() => setActiveFilter('pending')}
               >
-                <option value="">All Properties</option>
-                <option value="Cozy Studio">Cozy Studio</option>
-                <option value="Modern 2BR">Modern 2BR</option>
-                <option value="Luxury Penthouse">Luxury Penthouse</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label className="filter-label">Date Range</label>
-              <select
-                name="dateRange"
-                className="filter-select"
-                value={filters.dateRange}
-                onChange={handleFilterChange}
+                Pending ({bookings.filter(b => b.status === 'pending').length})
+              </FilterButton>
+              <FilterButton 
+                isActive={activeFilter === 'approved'}
+                onClick={() => setActiveFilter('approved')}
               >
-                <option value="">All Time</option>
-                <option value="today">Today</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-              </select>
-            </div>
-          </div>
-        </div>
+                Approved ({bookings.filter(b => b.status === 'approved').length})
+              </FilterButton>
+              <FilterButton 
+                isActive={activeFilter === 'rejected'}
+                onClick={() => setActiveFilter('rejected')}
+              >
+                Rejected ({bookings.filter(b => b.status === 'rejected').length})
+              </FilterButton>
+            </FilterBar>
 
-        <div className="booking-requests-grid">
-          {filteredRequests.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">📋</div>
-              <h3 className="empty-title">No booking requests found</h3>
-              <p className="empty-description">
-                {filters.status || filters.property 
-                  ? "No requests match your current filters."
-                  : "You don't have any booking requests yet."
-                }
-              </p>
-            </div>
-          ) : (
-            filteredRequests.map(request => {
-              const statusInfo = getStatusDisplay(request.status);
-              return (
-                <div key={request.id} className="booking-request-card">
-                  <div className="request-header">
-                    <div>
-                      <h3 className="request-title">{request.title}</h3>
-                      <p className="request-property">{request.property}</p>
-                    </div>
-                    <span className={`request-status ${statusInfo.class}`}>
-                      {statusInfo.label}
-                    </span>
-                  </div>
-
-                  <div className="request-details">
-                    <div className="detail-item">
-                      <span className="detail-label">Move-in Date</span>
-                      <span className="detail-value">{request.moveInDate}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Duration</span>
-                      <span className="detail-value">{request.duration}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Monthly Rent</span>
-                      <span className="detail-value">{request.rent}</span>
-                    </div>
-                  </div>
-
-                  <div className="applicant-info">
-                    <div className="applicant-header">
-                      <div className="applicant-avatar">
-                        {request.applicant.avatar}
-                      </div>
-                      <div className="applicant-details">
-                        <h4>{request.applicant.name}</h4>
-                        <p>{request.applicant.email} • {request.applicant.phone}</p>
-                      </div>
-                    </div>
-                    <div className="applicant-stats">
-                      <div className="applicant-stat">
-                        <div className="applicant-stat-value">{request.applicant.rating}</div>
-                        <div className="applicant-stat-label">Rating</div>
-                      </div>
-                      <div className="applicant-stat">
-                        <div className="applicant-stat-value">{request.applicant.applications}</div>
-                        <div className="applicant-stat-label">Applications</div>
-                      </div>
-                      <div className="applicant-stat">
-                        <div className="applicant-stat-value">
-                          {request.applicant.verified ? "✓" : "✗"}
-                        </div>
-                        <div className="applicant-stat-label">Verified</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="request-actions">
-                    <Link 
-                      to={`/landlord/booking/${request.id}`} 
-                      className="action-button view-button"
-                    >
-                      View Details
-                    </Link>
-                    <button className="action-button message-button">
-                      Message
-                    </button>
-                    {request.status === 'pending' && (
-                      <>
-                        <button 
-                          className="action-button approve-button"
-                          onClick={() => handleApprove(request.id)}
-                        >
+            {filteredBookings.map(booking => (
+              <BookingItem key={booking.id}>
+                <BookingAvatar>
+                  {booking.tenant.split(' ').map(n => n[0]).join('')}
+                </BookingAvatar>
+                <BookingInfo>
+                  <BookingTitle>{booking.tenant}</BookingTitle>
+                  <BookingDetails>
+                    {booking.property} • ${booking.amount}/month
+                  </BookingDetails>
+                  <BookingDate>
+                    Move-in: {new Date(booking.moveInDate).toLocaleDateString()}
+                  </BookingDate>
+                </BookingInfo>
+                <BookingStatus status={booking.status}>
+                  {booking.status}
+                </BookingStatus>
+                <BookingActions>
+                  <ActionButton variant="outline" size="sm">
+                    View
+                  </ActionButton>
+                  {booking.status === 'pending' && (
+                    <>
+                      <ActionButton variant="primary" size="sm">
                           Approve
-                        </button>
-                        <button 
-                          className="action-button reject-button"
-                          onClick={() => handleReject(request.id)}
-                        >
+                      </ActionButton>
+                      <ActionButton variant="outline" size="sm" color="error">
                           Reject
-                        </button>
+                      </ActionButton>
                       </>
                     )}
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </div>
-    </div>
+                </BookingActions>
+              </BookingItem>
+            ))}
+          </BookingList>
+
+          <Sidebar>
+            <QuickActions>
+              <SectionTitle>Quick Actions</SectionTitle>
+              <ActionItem>
+                <ActionIcon>📊</ActionIcon>
+                <ActionText>
+                  <ActionTitle>View Analytics</ActionTitle>
+                  <ActionDescription>Detailed booking statistics</ActionDescription>
+                </ActionText>
+              </ActionItem>
+              <ActionItem>
+                <ActionIcon>⚙️</ActionIcon>
+                <ActionText>
+                  <ActionTitle>Settings</ActionTitle>
+                  <ActionDescription>Booking preferences</ActionDescription>
+                </ActionText>
+              </ActionItem>
+              <ActionItem>
+                <ActionIcon>📧</ActionIcon>
+                <ActionText>
+                  <ActionTitle>Notifications</ActionTitle>
+                  <ActionDescription>Email and push alerts</ActionDescription>
+                </ActionText>
+              </ActionItem>
+            </QuickActions>
+
+            <RecentActivity>
+              <SectionTitle>Recent Activity</SectionTitle>
+              {recentActivity.map(activity => (
+                <ActivityItem key={activity.id}>
+                  <ActivityIcon>
+                    {activity.type === 'booking' && '📋'}
+                    {activity.type === 'approval' && '✓'}
+                    {activity.type === 'rejection' && '✗'}
+                  </ActivityIcon>
+                  <ActivityContent>
+                    <ActivityText>{activity.text}</ActivityText>
+                    <ActivityTime>{activity.time}</ActivityTime>
+                  </ActivityContent>
+                </ActivityItem>
+              ))}
+            </RecentActivity>
+          </Sidebar>
+        </ContentGrid>
+      </MainContent>
+    </BookingRequestContainer>
   );
 };
 

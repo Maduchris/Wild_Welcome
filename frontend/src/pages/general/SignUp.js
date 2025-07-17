@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Card from '../../components/ui/Card';
@@ -186,10 +187,12 @@ const Footer = styled.div`
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { register: registerUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [userType, setUserType] = useState('tenant');
+  const [userType, setUserType] = useState('user');
   const [password, setPassword] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [error, setError] = useState('');
   
   const {
     register,
@@ -209,18 +212,32 @@ const SignUp = () => {
 
   const onSubmit = async (data) => {
     if (!agreedToTerms) {
-      alert('Please agree to the terms and conditions');
+      setError('Please agree to the terms and conditions');
       return;
     }
     
     setIsLoading(true);
+    setError('');
+    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Sign up data:', { ...data, userType });
-      navigate('/signup-step2');
+      const userData = {
+        ...data,
+        user_type: userType,
+        phone: data.phone || '',
+      };
+      
+      const result = await registerUser(userData);
+      
+      if (result.success) {
+        // Registration successful - navigation is handled by the auth context
+        console.log('Registration successful:', result.user);
+      } else {
+        // Registration failed
+        setError(result.error);
+      }
     } catch (error) {
-      console.error('Sign up error:', error);
+      console.error('Registration error:', error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -230,148 +247,154 @@ const SignUp = () => {
     <SignUpContainer>
       <SignUpContent>
         <SignUpIllustration>
-          <img src="/images/zebra.jpg" alt="Zebra illustration" onError={e => { e.target.onerror = null; e.target.style.display='none'; e.target.parentNode.innerHTML += '<div style=\'color:#86571F;text-align:center;\'>Image not found</div>'; }} />
+          <img src="/images/signup-illustration.jpg" alt="Wild Welcome" />
         </SignUpIllustration>
         <SignUpCard
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          as={motion.div}
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <Card>
-            <Logo>
-              <h1>Wild Welcome</h1>
-              <p>Create your account to get started</p>
-            </Logo>
+          <Logo>
+            <h1>Wild Welcome</h1>
+            <p>Join our community of wildlife enthusiasts</p>
+          </Logo>
+
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            {error && (
+              <div style={{ 
+                color: '#D32F2F', 
+                backgroundColor: '#FFEBEE', 
+                padding: '0.75rem', 
+                borderRadius: '0.5rem', 
+                marginBottom: '1rem',
+                fontSize: '0.875rem'
+              }}>
+                {error}
+              </div>
+            )}
 
             <UserTypeSelector>
               <UserTypeButton
                 type="button"
-                isSelected={userType === 'tenant'}
-                onClick={() => setUserType('tenant')}
+                isSelected={userType === 'user'}
+                onClick={() => setUserType('user')}
               >
-                👤 I'm looking for a room
+                🏠 I'm looking for a room
               </UserTypeButton>
               <UserTypeButton
                 type="button"
                 isSelected={userType === 'landlord'}
                 onClick={() => setUserType('landlord')}
               >
-                🏠 I'm a landlord
+                🏢 I'm a landlord
               </UserTypeButton>
             </UserTypeSelector>
 
-            <Form onSubmit={handleSubmit(onSubmit)}>
-              <NameRow>
-                <Input
-                  label="First Name"
-                  placeholder="Enter your first name"
-                  {...register('firstName', {
-                    required: 'First name is required',
-                  })}
-                  error={errors.firstName?.message}
-                />
-                <Input
-                  label="Last Name"
-                  placeholder="Enter your last name"
-                  {...register('lastName', {
-                    required: 'Last name is required',
-                  })}
-                  error={errors.lastName?.message}
-                />
-              </NameRow>
-
+            <NameRow>
               <Input
-                label="Email Address"
-                type="email"
-                placeholder="Enter your email"
-                {...register('email', {
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Invalid email address',
-                  },
+                label="First Name"
+                placeholder="Enter your first name"
+                {...register('first_name', {
+                  required: 'First name is required',
                 })}
-                error={errors.email?.message}
+                error={errors.first_name?.message}
               />
-
               <Input
-                label="Password"
-                type="password"
-                placeholder="Create a password"
-                {...register('password', {
-                  required: 'Password is required',
-                  minLength: {
-                    value: 8,
-                    message: 'Password must be at least 8 characters',
-                  },
-                  pattern: {
-                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                    message: 'Password must contain uppercase, lowercase, and number',
-                  },
+                label="Last Name"
+                placeholder="Enter your last name"
+                {...register('last_name', {
+                  required: 'Last name is required',
                 })}
-                error={errors.password?.message}
+                error={errors.last_name?.message}
               />
+            </NameRow>
 
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="Enter your email"
+              {...register('email', {
+                required: 'Email is required',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: 'Invalid email address',
+                },
+              })}
+              error={errors.email?.message}
+            />
+
+            <Input
+              label="Phone Number (Optional)"
+              type="tel"
+              placeholder="Enter your phone number"
+              {...register('phone')}
+              error={errors.phone?.message}
+            />
+
+            <Input
+              label="Password"
+              type="password"
+              placeholder="Create a password"
+              {...register('password', {
+                required: 'Password is required',
+                minLength: {
+                  value: 8,
+                  message: 'Password must be at least 8 characters',
+                },
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                  message: 'Password must contain uppercase, lowercase, and number',
+                },
+              })}
+              error={errors.password?.message}
+            />
+
+            {watchedPassword && (
               <PasswordRequirements>
-                <strong>Password requirements:</strong>
+                <h4>Password Requirements:</h4>
                 {passwordRequirements.map((req, index) => (
                   <Requirement key={index} isMet={req.met}>
-                    <span>{req.met ? '✅' : '⭕'}</span>
-                    {req.label}
+                    {req.met ? '✓' : '○'} {req.label}
                   </Requirement>
                 ))}
               </PasswordRequirements>
+            )}
 
-              <Input
-                label="Confirm Password"
-                type="password"
-                placeholder="Confirm your password"
-                {...register('confirmPassword', {
-                  required: 'Please confirm your password',
-                  validate: (value) => value === watchedPassword || 'Passwords do not match',
-                })}
-                error={errors.confirmPassword?.message}
+            <CheckboxContainer>
+              <Checkbox
+                type="checkbox"
+                id="terms"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
               />
+              <CheckboxLabel htmlFor="terms">
+                I agree to the{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer">
+                  Terms and Conditions
+                </a>{' '}
+                and{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  Privacy Policy
+                </a>
+              </CheckboxLabel>
+            </CheckboxContainer>
 
-              <CheckboxContainer>
-                <Checkbox
-                  type="checkbox"
-                  id="terms"
-                  checked={agreedToTerms}
-                  onChange={(e) => setAgreedToTerms(e.target.checked)}
-                />
-                <CheckboxLabel htmlFor="terms">
-                  I agree to the{' '}
-                  <a href="/terms" target="_blank" rel="noopener noreferrer">
-                    Terms of Service
-                  </a>{' '}
-                  and{' '}
-                  <a href="/privacy" target="_blank" rel="noopener noreferrer">
-                    Privacy Policy
-                  </a>
-                </CheckboxLabel>
-              </CheckboxContainer>
+            <Button
+              type="submit"
+              variant="primary"
+              size="large"
+              disabled={isLoading}
+              style={{ width: '100%' }}
+            >
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </Button>
+          </Form>
 
-              <Button
-                type="submit"
-                fullWidth
-                loading={isLoading}
-                disabled={!agreedToTerms}
-              >
-                Create Account
-              </Button>
-            </Form>
-
-            <Footer>
-              <p>
-                Already have an account?{' '}
-                <Link to="/login">Sign in</Link>
-              </p>
-              <p>
-                <Link to="/">Back to home</Link>
-              </p>
-            </Footer>
-          </Card>
+          <Footer>
+            <p>Already have an account?</p>
+            <Link to="/login">Sign in here</Link>
+          </Footer>
         </SignUpCard>
       </SignUpContent>
     </SignUpContainer>

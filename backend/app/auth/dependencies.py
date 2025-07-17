@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from app.auth.jwt import verify_token
+from app.auth.jwt import verify_access_token
 from app.database.mongodb import get_database
 from app.models.user import User
 from bson import ObjectId
@@ -21,7 +21,7 @@ async def get_current_user(
     )
     
     try:
-        payload = verify_token(credentials.credentials)
+        payload = verify_access_token(credentials.credentials)
         if payload is None:
             raise credentials_exception
             
@@ -36,6 +36,11 @@ async def get_current_user(
     user_data = await db.users.find_one({"email": email})
     if user_data is None:
         raise credentials_exception
+    
+    # Convert _id to id for Pydantic model
+    if "_id" in user_data:
+        user_data["id"] = str(user_data["_id"])
+        del user_data["_id"]
         
     return User(**user_data)
 
@@ -66,7 +71,7 @@ async def get_optional_current_user(
         return None
         
     try:
-        payload = verify_token(credentials.credentials)
+        payload = verify_access_token(credentials.credentials)
         if payload is None:
             return None
             
@@ -77,6 +82,11 @@ async def get_optional_current_user(
         user_data = await db.users.find_one({"email": email})
         if user_data is None:
             return None
+        
+        # Convert _id to id for Pydantic model
+        if "_id" in user_data:
+            user_data["id"] = str(user_data["_id"])
+            del user_data["_id"]
             
         return User(**user_data)
     except Exception:

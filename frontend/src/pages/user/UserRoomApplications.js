@@ -8,42 +8,42 @@ const UserRoomApplications = () => {
   const applications = [
     {
       id: 1,
-      title: "Cozy Studio in Downtown",
-      location: "Downtown, City Center",
+      title: "Cozy Studio in Kigali City Center",
+      location: "Kigali, Rwanda",
       status: "pending",
       appliedDate: "2024-01-15",
       moveInDate: "2024-02-01",
-      rent: "$1,200/month",
+      rent: "$120/month",
       landlord: "John Smith"
     },
     {
       id: 2,
-      title: "Modern Room with View",
-      location: "University District",
+      title: "Modern Room in Remera",
+      location: "Remera, Kigali",
       status: "approved",
       appliedDate: "2024-01-10",
       moveInDate: "2024-01-25",
-      rent: "$800/month",
+      rent: "$180/month",
       landlord: "Sarah Johnson"
     },
     {
       id: 3,
-      title: "Luxury Apartment Suite",
-      location: "Riverside Area",
+      title: "Luxury Apartment in Nyarutarama",
+      location: "Nyarutarama, Kigali",
       status: "rejected",
       appliedDate: "2024-01-05",
       moveInDate: "2024-02-15",
-      rent: "$1,500/month",
+      rent: "$350/month",
       landlord: "Mike Wilson"
     },
     {
       id: 4,
-      title: "Shared Room Near Campus",
-      location: "Campus Area",
+      title: "Shared Room Near University",
+      location: "Kacyiru, Kigali",
       status: "withdrawn",
       appliedDate: "2024-01-12",
       moveInDate: "2024-02-01",
-      rent: "$600/month",
+      rent: "$90/month",
       landlord: "Lisa Brown"
     }
   ];

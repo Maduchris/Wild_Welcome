@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './AddRoom.css';
+import './AddProperty.css';
 
-const AddRoom = () => {
+const AddProperty = () => {
   const navigate = useNavigate();
+  const [propertyType, setPropertyType] = useState('room'); // 'room' or 'apartment'
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -20,19 +21,42 @@ const AddRoom = () => {
     city: '',
     state: '',
     zipCode: '',
+    floor: '',
+    buildingType: 'apartment',
     amenities: [],
     images: [],
     rules: '',
-    utilities: 'included'
+    utilities: 'included',
+    parking: 'available',
+    petPolicy: 'allowed'
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const amenities = [
+  const roomAmenities = [
     'WiFi', 'Kitchen', 'Private Bathroom', 'Balcony', 'Parking', 
     'Gym', 'Pool', 'Laundry', 'Air Conditioning', 'Heating',
     'Furnished', 'Pet Friendly', 'No Smoking', 'Security System'
   ];
+
+  const apartmentAmenities = [
+    'WiFi', 'Kitchen', 'Private Bathroom', 'Balcony', 'Parking', 
+    'Gym', 'Pool', 'Laundry', 'Air Conditioning', 'Heating',
+    'Furnished', 'Pet Friendly', 'No Smoking', 'Security System',
+    'Elevator', 'Doorman', 'Storage', 'Garden', 'Terrace'
+  ];
+
+  const amenities = propertyType === 'apartment' ? apartmentAmenities : roomAmenities;
+
+  const handlePropertyTypeChange = (type) => {
+    setPropertyType(type);
+    setFormData(prev => ({
+      ...prev,
+      propertyType: type,
+      bedrooms: type === 'apartment' ? 2 : 1,
+      bathrooms: type === 'apartment' ? 2 : 1
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -164,8 +188,8 @@ const AddRoom = () => {
   };
 
   return (
-    <div className="add-room-container">
-      <header className="add-room-header">
+    <div className="add-property-container">
+      <header className="add-property-header">
         <div className="header-content">
           <div className="logo">Wild Welcome</div>
           <nav className="landlord-nav">
@@ -181,18 +205,47 @@ const AddRoom = () => {
         </div>
       </header>
 
-      <div className="add-room-content">
+      <div className="add-property-content">
         <div className="page-header">
-          <h1 className="page-title">Add New Room</h1>
+          <h1 className="page-title">Add New Property</h1>
           <p className="page-subtitle">Create a new listing for your property</p>
         </div>
 
-        <form className="add-room-form">
+        <form className="add-property-form">
+          {/* Property Type Selection */}
+          <div className="form-section">
+            <h2 className="section-title">Property Type</h2>
+            <div className="property-type-selector">
+              <div 
+                className={`property-type-option ${propertyType === 'room' ? 'selected' : ''}`}
+                onClick={() => handlePropertyTypeChange('room')}
+              >
+                <div className="property-type-icon">🏠</div>
+                <div className="property-type-info">
+                  <h3>Room</h3>
+                  <p>Private or shared room in a house or apartment</p>
+                </div>
+              </div>
+              <div 
+                className={`property-type-option ${propertyType === 'apartment' ? 'selected' : ''}`}
+                onClick={() => handlePropertyTypeChange('apartment')}
+              >
+                <div className="property-type-icon">🏢</div>
+                <div className="property-type-info">
+                  <h3>Apartment</h3>
+                  <p>Full apartment, condo, or suite</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="form-section">
             <h2 className="section-title">Basic Information</h2>
             
             <div className="form-group full-width">
-              <label htmlFor="title" className="form-label required">Room Title</label>
+              <label htmlFor="title" className="form-label required">
+                {propertyType === 'apartment' ? 'Apartment' : 'Room'} Title
+              </label>
               <input
                 type="text"
                 id="title"
@@ -200,7 +253,7 @@ const AddRoom = () => {
                 className={`form-input ${errors.title ? 'error' : ''}`}
                 value={formData.title}
                 onChange={handleChange}
-                placeholder="e.g., Cozy Studio in Downtown"
+                placeholder={propertyType === 'apartment' ? 'e.g., Modern 2BR Apartment in Downtown' : 'e.g., Cozy Studio in Downtown'}
               />
               {errors.title && <span className="error-message">{errors.title}</span>}
             </div>
@@ -213,7 +266,7 @@ const AddRoom = () => {
                 className={`form-textarea ${errors.description ? 'error' : ''}`}
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Describe your room, its features, and what makes it special..."
+                placeholder="Describe your property, its features, and what makes it special..."
               />
               {errors.description && <span className="error-message">{errors.description}</span>}
             </div>
@@ -228,13 +281,43 @@ const AddRoom = () => {
                   value={formData.propertyType}
                   onChange={handleChange}
                 >
-                  <option value="room">Private Room</option>
-                  <option value="shared">Shared Room</option>
-                  <option value="studio">Studio</option>
-                  <option value="apartment">Apartment</option>
+                  {propertyType === 'room' ? (
+                    <>
+                      <option value="room">Private Room</option>
+                      <option value="shared">Shared Room</option>
+                      <option value="studio">Studio</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="apartment">Apartment</option>
+                      <option value="condo">Condo</option>
+                      <option value="penthouse">Penthouse</option>
+                      <option value="loft">Loft</option>
+                    </>
+                  )}
                 </select>
               </div>
 
+              {propertyType === 'apartment' && (
+                <div className="form-group">
+                  <label htmlFor="buildingType" className="form-label">Building Type</label>
+                  <select
+                    id="buildingType"
+                    name="buildingType"
+                    className="form-select"
+                    value={formData.buildingType}
+                    onChange={handleChange}
+                  >
+                    <option value="apartment">Apartment Building</option>
+                    <option value="condo">Condominium</option>
+                    <option value="townhouse">Townhouse</option>
+                    <option value="house">House</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
+            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="bedrooms" className="form-label">Bedrooms</label>
                 <select
@@ -247,12 +330,11 @@ const AddRoom = () => {
                   <option value={1}>1</option>
                   <option value={2}>2</option>
                   <option value={3}>3</option>
-                  <option value={4}>4+</option>
+                  <option value={4}>4</option>
+                  {propertyType === 'apartment' && <option value={5}>5+</option>}
                 </select>
               </div>
-            </div>
 
-            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="bathrooms" className="form-label">Bathrooms</label>
                 <select
@@ -268,7 +350,9 @@ const AddRoom = () => {
                   <option value={4}>4+</option>
                 </select>
               </div>
+            </div>
 
+            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="area" className="form-label">Area (sq ft)</label>
                 <input
@@ -278,9 +362,24 @@ const AddRoom = () => {
                   className="form-input"
                   value={formData.area}
                   onChange={handleChange}
-                  placeholder="e.g., 500"
+                  placeholder={propertyType === 'apartment' ? 'e.g., 800' : 'e.g., 500'}
                 />
               </div>
+
+              {propertyType === 'apartment' && (
+                <div className="form-group">
+                  <label htmlFor="floor" className="form-label">Floor</label>
+                  <input
+                    type="number"
+                    id="floor"
+                    name="floor"
+                    className="form-input"
+                    value={formData.floor}
+                    onChange={handleChange}
+                    placeholder="e.g., 5"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -297,7 +396,9 @@ const AddRoom = () => {
                   className={`form-input ${errors.rent ? 'error' : ''}`}
                   value={formData.rent}
                   onChange={handleChange}
-                  placeholder="e.g., 1200"
+                  placeholder={propertyType === 'apartment' ? 'e.g., 280' : 'e.g., 120'}
+                  min="50"
+                  max="500"
                 />
                 {errors.rent && <span className="error-message">{errors.rent}</span>}
               </div>
@@ -311,7 +412,7 @@ const AddRoom = () => {
                   className="form-input"
                   value={formData.deposit}
                   onChange={handleChange}
-                  placeholder="e.g., 1200"
+                  placeholder={propertyType === 'apartment' ? 'e.g., 1800' : 'e.g., 1200'}
                 />
               </div>
             </div>
@@ -361,7 +462,7 @@ const AddRoom = () => {
                 className={`form-input ${errors.location ? 'error' : ''}`}
                 value={formData.location}
                 onChange={handleChange}
-                placeholder="e.g., Downtown, University District"
+                placeholder="e.g., Kigali City Center, Remera, Kimihurura"
               />
               {errors.location && <span className="error-message">{errors.location}</span>}
             </div>
@@ -375,7 +476,7 @@ const AddRoom = () => {
                 className={`form-input ${errors.address ? 'error' : ''}`}
                 value={formData.address}
                 onChange={handleChange}
-                placeholder="e.g., 123 Main Street"
+                placeholder="e.g., 123 Main Street, Kigali"
               />
               {errors.address && <span className="error-message">{errors.address}</span>}
             </div>
@@ -390,13 +491,13 @@ const AddRoom = () => {
                   className={`form-input ${errors.city ? 'error' : ''}`}
                   value={formData.city}
                   onChange={handleChange}
-                  placeholder="e.g., New York"
+                  placeholder="e.g., Kigali"
                 />
                 {errors.city && <span className="error-message">{errors.city}</span>}
               </div>
 
               <div className="form-group">
-                <label htmlFor="state" className="form-label required">State</label>
+                <label htmlFor="state" className="form-label required">Province</label>
                 <input
                   type="text"
                   id="state"
@@ -404,14 +505,14 @@ const AddRoom = () => {
                   className={`form-input ${errors.state ? 'error' : ''}`}
                   value={formData.state}
                   onChange={handleChange}
-                  placeholder="e.g., NY"
+                  placeholder="e.g., Kigali Province"
                 />
                 {errors.state && <span className="error-message">{errors.state}</span>}
               </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="zipCode" className="form-label required">ZIP Code</label>
+              <label htmlFor="zipCode" className="form-label required">Postal Code</label>
               <input
                 type="text"
                 id="zipCode"
@@ -419,7 +520,7 @@ const AddRoom = () => {
                 className={`form-input ${errors.zipCode ? 'error' : ''}`}
                 value={formData.zipCode}
                 onChange={handleChange}
-                placeholder="e.g., 10001"
+                placeholder="e.g., 00001"
               />
               {errors.zipCode && <span className="error-message">{errors.zipCode}</span>}
             </div>
@@ -487,20 +588,57 @@ const AddRoom = () => {
           <div className="form-section">
             <h2 className="section-title">Additional Information</h2>
             
-            <div className="form-group">
-              <label htmlFor="utilities" className="form-label">Utilities</label>
-              <select
-                id="utilities"
-                name="utilities"
-                className="form-select"
-                value={formData.utilities}
-                onChange={handleChange}
-              >
-                <option value="included">Included in rent</option>
-                <option value="separate">Separate billing</option>
-                <option value="partial">Partially included</option>
-              </select>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="utilities" className="form-label">Utilities</label>
+                <select
+                  id="utilities"
+                  name="utilities"
+                  className="form-select"
+                  value={formData.utilities}
+                  onChange={handleChange}
+                >
+                  <option value="included">Included in rent</option>
+                  <option value="separate">Separate billing</option>
+                  <option value="partial">Partially included</option>
+                </select>
+              </div>
+
+              {propertyType === 'apartment' && (
+                <div className="form-group">
+                  <label htmlFor="parking" className="form-label">Parking</label>
+                  <select
+                    id="parking"
+                    name="parking"
+                    className="form-select"
+                    value={formData.parking}
+                    onChange={handleChange}
+                  >
+                    <option value="available">Available</option>
+                    <option value="not-available">Not Available</option>
+                    <option value="street">Street Parking</option>
+                  </select>
+                </div>
+              )}
             </div>
+
+            {propertyType === 'apartment' && (
+              <div className="form-group">
+                <label htmlFor="petPolicy" className="form-label">Pet Policy</label>
+                <select
+                  id="petPolicy"
+                  name="petPolicy"
+                  className="form-select"
+                  value={formData.petPolicy}
+                  onChange={handleChange}
+                >
+                  <option value="allowed">Pets Allowed</option>
+                  <option value="not-allowed">No Pets</option>
+                  <option value="cats-only">Cats Only</option>
+                  <option value="dogs-only">Dogs Only</option>
+                </select>
+              </div>
+            )}
 
             <div className="form-group full-width">
               <label htmlFor="rules" className="form-label">House Rules</label>
@@ -542,4 +680,4 @@ const AddRoom = () => {
   );
 };
 
-export default AddRoom; 
+export default AddProperty; 

@@ -1,6 +1,273 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './LandlordPropertyManagement.css';
+import styled from 'styled-components';
+import Header from '../../components/ui/Header';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+
+const PropertyManagementContainer = styled.div`
+  min-height: 100vh;
+  background-color: ${props => props.theme.colors.background};
+`;
+
+const MainContent = styled.main`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: ${props => props.theme.spacing.xl};
+`;
+
+const PageHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: ${props => props.theme.spacing.xxxl};
+  
+  @media (max-width: ${props => props.theme.breakpoints.md}) {
+    flex-direction: column;
+    gap: ${props => props.theme.spacing.lg};
+    align-items: flex-start;
+  }
+`;
+
+const PageTitle = styled.h1`
+  font-size: ${props => props.theme.typography.fontSizes['3xl']};
+  font-weight: ${props => props.theme.typography.fontWeights.bold};
+  color: ${props => props.theme.colors.text};
+`;
+
+const AddPropertyButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing.sm};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+`;
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: ${props => props.theme.spacing.xl};
+  margin-bottom: ${props => props.theme.spacing.xxxl};
+`;
+
+const StatCard = styled(Card)`
+  text-align: center;
+  padding: ${props => props.theme.spacing.xl};
+  transition: transform ${props => props.theme.transitions.normal};
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+const StatIcon = styled.div`
+  width: 60px;
+  height: 60px;
+  background-color: ${props => props.iconColor || props.theme.colors.primaryLight};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto ${props => props.theme.spacing.lg};
+  font-size: ${props => props.theme.typography.fontSizes.xl};
+  color: ${props => props.theme.colors.white};
+`;
+
+const StatNumber = styled.div`
+  font-size: ${props => props.theme.typography.fontSizes['3xl']};
+  font-weight: ${props => props.theme.typography.fontWeights.bold};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.sm};
+`;
+
+const StatLabel = styled.p`
+  color: ${props => props.theme.colors.textSecondary};
+  font-size: ${props => props.theme.typography.fontSizes.base};
+  margin: 0 0 ${props => props.theme.spacing.sm} 0;
+`;
+
+const StatChange = styled.div`
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.isPositive ? props.theme.colors.success : props.isNegative ? props.theme.colors.error : props.theme.colors.textSecondary};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+`;
+
+const ContentSection = styled.div`
+  margin-bottom: ${props => props.theme.spacing.xxxl};
+`;
+
+const SectionTitle = styled.h2`
+  font-size: ${props => props.theme.typography.fontSizes.xl};
+  font-weight: ${props => props.theme.typography.fontWeights.semibold};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.lg};
+`;
+
+const FilterBar = styled.div`
+  display: flex;
+  gap: ${props => props.theme.spacing.md};
+  margin-bottom: ${props => props.theme.spacing.xl};
+  flex-wrap: wrap;
+  align-items: end;
+`;
+
+const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${props => props.theme.spacing.xs};
+`;
+
+const FilterLabel = styled.label`
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  color: ${props => props.theme.colors.text};
+`;
+
+const FilterSelect = styled.select`
+  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: ${props => props.theme.borderRadius.md};
+  background-color: ${props => props.theme.colors.inputBackground};
+  color: ${props => props.theme.colors.text};
+  font-size: ${props => props.theme.typography.fontSizes.base};
+  min-width: 150px;
+  
+  &:focus {
+    outline: none;
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 3px ${props => props.theme.colors.primary}33;
+  }
+`;
+
+const FilterInput = styled.input`
+  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: ${props => props.theme.borderRadius.md};
+  background-color: ${props => props.theme.colors.inputBackground};
+  color: ${props => props.theme.colors.text};
+  font-size: ${props => props.theme.typography.fontSizes.base};
+  min-width: 200px;
+  
+  &:focus {
+    outline: none;
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 3px ${props => props.theme.colors.primary}33;
+  }
+`;
+
+const PropertiesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: ${props => props.theme.spacing.xl};
+`;
+
+const PropertyCard = styled(Card)`
+  padding: ${props => props.theme.spacing.xl};
+  transition: transform ${props => props.theme.transitions.normal};
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+const PropertyHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing.md};
+  margin-bottom: ${props => props.theme.spacing.lg};
+`;
+
+const PropertyIcon = styled.div`
+  width: 50px;
+  height: 50px;
+  background-color: ${props => props.theme.colors.primaryLight};
+  border-radius: ${props => props.theme.borderRadius.md};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: ${props => props.theme.typography.fontSizes.xl};
+  color: ${props => props.theme.colors.white};
+  flex-shrink: 0;
+`;
+
+const PropertyInfo = styled.div`
+  flex: 1;
+`;
+
+const PropertyTitle = styled.h3`
+  font-size: ${props => props.theme.typography.fontSizes.lg};
+  font-weight: ${props => props.theme.typography.fontWeights.semibold};
+  color: ${props => props.theme.colors.text};
+  margin: 0 0 ${props => props.theme.spacing.xs} 0;
+`;
+
+const PropertyLocation = styled.p`
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.theme.colors.textSecondary};
+  margin: 0;
+`;
+
+const PropertyDetails = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: ${props => props.theme.spacing.md};
+  margin-bottom: ${props => props.theme.spacing.lg};
+`;
+
+const DetailItem = styled.div`
+  text-align: center;
+  padding: ${props => props.theme.spacing.sm};
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.md};
+`;
+
+const DetailLabel = styled.div`
+  font-size: ${props => props.theme.typography.fontSizes.xs};
+  color: ${props => props.theme.colors.textSecondary};
+  margin-bottom: ${props => props.theme.spacing.xs};
+`;
+
+const DetailValue = styled.div`
+  font-size: ${props => props.theme.typography.fontSizes.base};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  color: ${props => props.theme.colors.text};
+`;
+
+const PropertyPrice = styled.div`
+  font-size: ${props => props.theme.typography.fontSizes.lg};
+  font-weight: ${props => props.theme.typography.fontWeights.bold};
+  color: ${props => props.theme.colors.primary};
+  margin-bottom: ${props => props.theme.spacing.lg};
+`;
+
+const PropertyStatus = styled.span`
+  padding: ${props => props.theme.spacing.xs} ${props => props.theme.spacing.sm};
+  border-radius: ${props => props.theme.borderRadius.sm};
+  font-size: ${props => props.theme.typography.fontSizes.xs};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  background-color: ${props => {
+    switch (props.status) {
+      case 'available':
+        return props.theme.colors.success;
+      case 'occupied':
+        return props.theme.colors.warning;
+      case 'maintenance':
+        return props.theme.colors.error;
+      default:
+        return props.theme.colors.gray[500];
+    }
+  }};
+  color: ${props => props.theme.colors.white};
+`;
+
+const PropertyActions = styled.div`
+  display: flex;
+  gap: ${props => props.theme.spacing.sm};
+`;
+
+const ActionButton = styled(Button)`
+  flex: 1;
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+`;
 
 const LandlordPropertyManagement = () => {
   const [filters, setFilters] = useState({
@@ -12,51 +279,75 @@ const LandlordPropertyManagement = () => {
   const properties = [
     {
       id: 1,
-      title: "Cozy Studio in Downtown",
-      location: "Downtown, City Center",
+      title: "Cozy Studio in Kigali City Center",
+      location: "Kigali, Rwanda",
       status: "available",
       type: "Studio",
-      price: "$1,200/month",
+      price: "$120/month",
       bedrooms: 1,
       bathrooms: 1,
       area: "500 sq ft",
-      image: "🏠"
+      icon: "🏠"
     },
     {
       id: 2,
-      title: "Modern 2BR Apartment",
-      location: "University District",
+      title: "Modern 2BR Apartment in Remera",
+      location: "Remera, Kigali",
       status: "occupied",
       type: "Apartment",
-      price: "$1,800/month",
+      price: "$280/month",
       bedrooms: 2,
       bathrooms: 2,
       area: "800 sq ft",
-      image: "🏢"
+      icon: "🏢"
     },
     {
       id: 3,
-      title: "Luxury Penthouse Suite",
-      location: "Riverside Area",
+      title: "Luxury Suite in Nyarutarama",
+      location: "Nyarutarama, Kigali",
       status: "maintenance",
       type: "Penthouse",
-      price: "$2,500/month",
+      price: "$450/month",
       bedrooms: 3,
       bathrooms: 2,
       area: "1200 sq ft",
-      image: "🏰"
+      icon: "🏰"
     },
     {
       id: 4,
-      title: "Shared Room Near Campus",
-      location: "Campus Area",
+      title: "Shared Room Near University",
+      location: "Kacyiru, Kigali",
       status: "available",
       type: "Shared Room",
-      price: "$600/month",
+      price: "$90/month",
       bedrooms: 1,
       bathrooms: 1,
       area: "300 sq ft",
-      image: "🏘️"
+      icon: "🏘️"
+    },
+    {
+      id: 5,
+      title: "Garden View Apartment in Gisozi",
+      location: "Gisozi, Kigali",
+      status: "available",
+      type: "Apartment",
+      price: "$200/month",
+      bedrooms: 2,
+      bathrooms: 1,
+      area: "750 sq ft",
+      icon: "🏡"
+    },
+    {
+      id: 6,
+      title: "Executive Suite in Business District",
+      location: "Kigali Business District",
+      status: "occupied",
+      type: "Suite",
+      price: "$380/month",
+      bedrooms: 2,
+      bathrooms: 2,
+      area: "1000 sq ft",
+      icon: "🏢"
     }
   ];
 
@@ -67,7 +358,7 @@ const LandlordPropertyManagement = () => {
       change: "+2",
       changeType: "positive",
       icon: "🏠",
-      color: "blue"
+      iconColor: "#3B82F6"
     },
     {
       title: "Available",
@@ -75,7 +366,7 @@ const LandlordPropertyManagement = () => {
       change: "+1",
       changeType: "positive",
       icon: "✅",
-      color: "green"
+      iconColor: "#10B981"
     },
     {
       title: "Occupied",
@@ -83,7 +374,7 @@ const LandlordPropertyManagement = () => {
       change: "0",
       changeType: "neutral",
       icon: "👥",
-      color: "orange"
+      iconColor: "#F59E0B"
     },
     {
       title: "Maintenance",
@@ -91,18 +382,9 @@ const LandlordPropertyManagement = () => {
       change: "+1",
       changeType: "negative",
       icon: "🔧",
-      color: "red"
+      iconColor: "#EF4444"
     }
   ];
-
-  const getStatusDisplay = (status) => {
-    const statusMap = {
-      available: { label: 'Available', class: 'status-available' },
-      occupied: { label: 'Occupied', class: 'status-occupied' },
-      maintenance: { label: 'Maintenance', class: 'status-maintenance' }
-    };
-    return statusMap[status] || { label: 'Unknown', class: 'status-available' };
-  };
 
   const filteredProperties = properties.filter(property => {
     if (filters.status && property.status !== filters.status) return false;
@@ -120,57 +402,45 @@ const LandlordPropertyManagement = () => {
   };
 
   return (
-    <div className="property-management-container">
-      <header className="property-management-header">
-        <div className="header-content">
-          <div className="logo">Wild Welcome</div>
-          <nav className="landlord-nav">
-            <Link to="/landlord/dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/landlord/properties" className="nav-link active">Properties</Link>
-            <Link to="/landlord/calendar" className="nav-link">Calendar</Link>
-            <Link to="/landlord/bookings" className="nav-link">Bookings</Link>
-            <Link to="/landlord/account" className="nav-link">Account</Link>
-          </nav>
-          <div className="user-menu">
-            <div className="user-avatar">LS</div>
-          </div>
-        </div>
-      </header>
-
-      <div className="property-management-content">
-        <div className="page-header">
-          <h1 className="page-title">Property Management</h1>
-          <Link to="/landlord/add-room" className="add-property-button">
-            + Add Property
+    <PropertyManagementContainer>
+      <Header userType="landlord" userInitials="LS" />
+      
+      <MainContent>
+        <PageHeader>
+          <PageTitle>Property Management</PageTitle>
+          <Link to="/landlord/add-property" style={{ textDecoration: 'none' }}>
+            <AddPropertyButton variant="primary">
+              <span>+</span>
+              Add Property
+            </AddPropertyButton>
           </Link>
-        </div>
+        </PageHeader>
 
-        <div className="property-stats">
+        <StatsGrid>
           {stats.map((stat, index) => (
-            <div key={index} className="stat-card">
-              <div className="stat-header">
-                <span className="stat-title">{stat.title}</span>
-                <div className={`stat-icon ${stat.color}`}>
-                  {stat.icon}
-                </div>
-              </div>
-              <div className="stat-value">{stat.value}</div>
-              <div className={`stat-change ${stat.changeType}`}>
+            <StatCard key={index}>
+              <StatIcon iconColor={stat.iconColor}>{stat.icon}</StatIcon>
+              <StatNumber>{stat.value}</StatNumber>
+              <StatLabel>{stat.title}</StatLabel>
+              <StatChange 
+                isPositive={stat.changeType === 'positive'}
+                isNegative={stat.changeType === 'negative'}
+              >
                 {stat.changeType === 'positive' && '+'}
                 {stat.change} from last month
-              </div>
-            </div>
+              </StatChange>
+            </StatCard>
           ))}
-        </div>
+        </StatsGrid>
 
-        <div className="property-filters">
-          <h3 className="filters-title">Filters</h3>
-          <div className="filters-row">
-            <div className="filter-group">
-              <label className="filter-label">Status</label>
-              <select
+        <ContentSection>
+          <SectionTitle>Properties</SectionTitle>
+          
+          <FilterBar>
+            <FilterGroup>
+              <FilterLabel>Status</FilterLabel>
+              <FilterSelect
                 name="status"
-                className="filter-select"
                 value={filters.status}
                 onChange={handleFilterChange}
               >
@@ -178,13 +448,13 @@ const LandlordPropertyManagement = () => {
                 <option value="available">Available</option>
                 <option value="occupied">Occupied</option>
                 <option value="maintenance">Maintenance</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label className="filter-label">Property Type</label>
-              <select
+              </FilterSelect>
+            </FilterGroup>
+            
+            <FilterGroup>
+              <FilterLabel>Property Type</FilterLabel>
+              <FilterSelect
                 name="type"
-                className="filter-select"
                 value={filters.type}
                 onChange={handleFilterChange}
               >
@@ -193,85 +463,74 @@ const LandlordPropertyManagement = () => {
                 <option value="Apartment">Apartment</option>
                 <option value="Penthouse">Penthouse</option>
                 <option value="Shared Room">Shared Room</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label className="filter-label">Location</label>
-              <input
+                <option value="Suite">Suite</option>
+              </FilterSelect>
+            </FilterGroup>
+            
+            <FilterGroup>
+              <FilterLabel>Location</FilterLabel>
+              <FilterInput
                 type="text"
                 name="location"
-                className="filter-input"
                 placeholder="Search by location..."
                 value={filters.location}
                 onChange={handleFilterChange}
               />
-            </div>
-          </div>
-        </div>
+            </FilterGroup>
+          </FilterBar>
 
-        <div className="properties-grid">
-          {filteredProperties.map(property => {
-            const statusInfo = getStatusDisplay(property.status);
-            return (
-              <div key={property.id} className="property-card">
-                <div className="property-image">
-                  {property.image}
-                  <span className={`property-status ${statusInfo.class}`}>
-                    {statusInfo.label}
-                  </span>
-                </div>
-                <div className="property-content">
-                  <div className="property-header">
-                    <div>
-                      <h3 className="property-title">{property.title}</h3>
-                      <p className="property-location">{property.location}</p>
-                    </div>
-                    <div className="property-price">{property.price}</div>
-                  </div>
-
-                  <div className="property-details">
-                    <div className="detail-item">
-                      <span className="detail-label">Type</span>
-                      <span className="detail-value">{property.type}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Bedrooms</span>
-                      <span className="detail-value">{property.bedrooms}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Bathrooms</span>
-                      <span className="detail-value">{property.bathrooms}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Area</span>
-                      <span className="detail-value">{property.area}</span>
-                    </div>
-                  </div>
-
-                  <div className="property-actions">
-                    <Link 
-                      to={`/landlord/property/${property.id}`} 
-                      className="action-button edit-button"
-                    >
-                      Edit
-                    </Link>
-                    <Link 
-                      to={`/landlord/property/${property.id}/view`} 
-                      className="action-button view-button"
-                    >
-                      View
-                    </Link>
-                    <button className="action-button delete-button">
+          <PropertiesGrid>
+            {filteredProperties.map(property => (
+              <PropertyCard key={property.id}>
+                <PropertyHeader>
+                  <PropertyIcon>{property.icon}</PropertyIcon>
+                  <PropertyInfo>
+                    <PropertyTitle>{property.title}</PropertyTitle>
+                    <PropertyLocation>{property.location}</PropertyLocation>
+                  </PropertyInfo>
+                  <PropertyStatus status={property.status}>
+                    {property.status}
+                  </PropertyStatus>
+                </PropertyHeader>
+                
+                <PropertyPrice>{property.price}</PropertyPrice>
+                
+                <PropertyDetails>
+                  <DetailItem>
+                    <DetailLabel>Bedrooms</DetailLabel>
+                    <DetailValue>{property.bedrooms}</DetailValue>
+                  </DetailItem>
+                  <DetailItem>
+                    <DetailLabel>Bathrooms</DetailLabel>
+                    <DetailValue>{property.bathrooms}</DetailValue>
+                  </DetailItem>
+                  <DetailItem>
+                    <DetailLabel>Area</DetailLabel>
+                    <DetailValue>{property.area}</DetailValue>
+                  </DetailItem>
+                  <DetailItem>
+                    <DetailLabel>Type</DetailLabel>
+                    <DetailValue>{property.type}</DetailValue>
+                  </DetailItem>
+                </PropertyDetails>
+                
+                <PropertyActions>
+                  <ActionButton variant="outline" size="sm">
+                    View Details
+                  </ActionButton>
+                  <ActionButton variant="outline" size="sm">
+                    Edit
+                  </ActionButton>
+                  <ActionButton variant="outline" size="sm" color="error">
                       Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
+                  </ActionButton>
+                </PropertyActions>
+              </PropertyCard>
+            ))}
+          </PropertiesGrid>
+        </ContentSection>
+      </MainContent>
+    </PropertyManagementContainer>
   );
 };
 

@@ -195,6 +195,15 @@ const BookingProcess1 = () => {
     navigate(`/user/listing/${listingId}`);
   };
 
+  const [selectedProperty, setSelectedProperty] = useState({
+    id: 1,
+    title: 'Cozy Studio in Kigali City Center',
+    location: 'Kigali, Rwanda',
+    price: 120,
+    features: ['Furnished', 'Private Bathroom', 'WiFi'],
+    image: '🏠'
+  });
+
   return (
     <BookingContainer>
       <BookingCard

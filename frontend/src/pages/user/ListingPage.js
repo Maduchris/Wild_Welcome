@@ -266,10 +266,10 @@ const ListingPage = () => {
     setTimeout(() => {
       setListing({
         id: id,
-        title: 'Cozy Studio in Downtown',
-        location: 'Downtown, New York',
-        price: 1200,
-        description: 'Beautiful studio apartment in the heart of downtown. Recently renovated with modern amenities and stunning city views. Perfect for young professionals or students.',
+        title: 'Cozy Studio in Kigali City Center',
+        location: 'Kigali, Rwanda',
+        price: 120,
+        description: 'Beautiful studio apartment in the heart of Kigali. Recently renovated with modern amenities and stunning city views. Perfect for young professionals or students.',
         amenities: [
           { icon: '🛏️', text: 'Furnished' },
           { icon: '🚿', text: 'Private Bathroom' },
@@ -283,7 +283,7 @@ const ListingPage = () => {
         images: ['🏠', '🛏️', '🚿', '🏋️'],
         landlord: {
           name: 'Sarah Johnson',
-          phone: '+1 (555) 123-4567',
+          phone: '+250 788 123 456',
           email: 'sarah.johnson@email.com',
         },
       });

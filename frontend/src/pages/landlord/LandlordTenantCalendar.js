@@ -1,6 +1,258 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './LandlordTenantCalendar.css';
+import styled from 'styled-components';
+import Header from '../../components/ui/Header';
+
+const CalendarContainer = styled.div`
+  min-height: 100vh;
+  background-color: ${props => props.theme.colors.background};
+`;
+
+const MainContent = styled.main`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: ${props => props.theme.spacing.xl};
+`;
+
+const PageHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: ${props => props.theme.spacing.xl};
+  
+  @media (max-width: ${props => props.theme.breakpoints.md}) {
+    flex-direction: column;
+    gap: ${props => props.theme.spacing.lg};
+    align-items: flex-start;
+  }
+`;
+
+const PageTitle = styled.h1`
+  font-size: ${props => props.theme.typography.fontSizes['3xl']};
+  font-weight: ${props => props.theme.typography.fontWeights.bold};
+  color: ${props => props.theme.colors.text};
+`;
+
+const CalendarControls = styled.div`
+  display: flex;
+  gap: ${props => props.theme.spacing.lg};
+  align-items: center;
+`;
+
+const CalendarNav = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing.md};
+`;
+
+const NavButton = styled.button`
+  background: none;
+  border: none;
+  font-size: ${props => props.theme.typography.fontSizes.lg};
+  color: ${props => props.theme.colors.text};
+  cursor: pointer;
+  padding: ${props => props.theme.spacing.sm};
+  border-radius: ${props => props.theme.borderRadius.md};
+  transition: all ${props => props.theme.transitions.normal};
+  
+  &:hover {
+    background-color: ${props => props.theme.colors.surface};
+    color: ${props => props.theme.colors.primary};
+  }
+`;
+
+const CurrentMonth = styled.span`
+  font-size: ${props => props.theme.typography.fontSizes.lg};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  color: ${props => props.theme.colors.text};
+  min-width: 120px;
+  text-align: center;
+`;
+
+const ViewToggle = styled.div`
+  display: flex;
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: ${props => props.theme.borderRadius.md};
+  overflow: hidden;
+`;
+
+const ViewButton = styled.button`
+  background: ${props => props.isActive ? props.theme.colors.primary : 'transparent'};
+  color: ${props => props.isActive ? props.theme.colors.white : props.theme.colors.text};
+  border: none;
+  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
+  cursor: pointer;
+  transition: all ${props => props.theme.transitions.normal};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  
+  &:hover {
+    background: ${props => props.isActive ? props.theme.colors.primary : props.theme.colors.surface};
+  }
+`;
+
+const ContentGrid = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: ${props => props.theme.spacing.xl};
+  
+  @media (max-width: ${props => props.theme.breakpoints.lg}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const CalendarMain = styled.div`
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.lg};
+  padding: ${props => props.theme.spacing.xl};
+  box-shadow: ${props => props.theme.shadows.md};
+`;
+
+const CalendarGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background-color: ${props => props.theme.colors.border};
+  border-radius: ${props => props.theme.borderRadius.md};
+  overflow: hidden;
+`;
+
+const CalendarHeaderCell = styled.div`
+  background-color: ${props => props.theme.colors.primary};
+  color: ${props => props.theme.colors.white};
+  padding: ${props => props.theme.spacing.md};
+  text-align: center;
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+`;
+
+const CalendarCell = styled.div`
+  background-color: ${props => props.theme.colors.surface};
+  min-height: 100px;
+  padding: ${props => props.theme.spacing.sm};
+  display: flex;
+  flex-direction: column;
+  gap: ${props => props.theme.spacing.xs};
+  
+  ${props => props.isOtherMonth && `
+    background-color: ${props.theme.colors.background};
+    color: ${props.theme.colors.textSecondary};
+  `}
+  
+  ${props => props.isToday && `
+    background-color: ${props.theme.colors.primaryLight};
+    border: 2px solid ${props.theme.colors.primary};
+  `}
+`;
+
+const CalendarDate = styled.div`
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.isOtherMonth ? props.theme.colors.textSecondary : props.theme.colors.text};
+`;
+
+const CalendarEvents = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+`;
+
+const CalendarEvent = styled.div`
+  background-color: ${props => props.color || props.theme.colors.primaryLight};
+  color: ${props => props.theme.colors.text};
+  padding: 2px 4px;
+  border-radius: ${props => props.theme.borderRadius.sm};
+  font-size: ${props => props.theme.typography.fontSizes.xs};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+const CalendarSidebar = styled.div`
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.lg};
+  padding: ${props => props.theme.spacing.xl};
+  box-shadow: ${props => props.theme.shadows.md};
+  height: fit-content;
+`;
+
+const SidebarTitle = styled.h3`
+  font-size: ${props => props.theme.typography.fontSizes.lg};
+  font-weight: ${props => props.theme.typography.fontWeights.semibold};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.lg};
+`;
+
+const EventLegend = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${props => props.theme.spacing.sm};
+  margin-bottom: ${props => props.theme.spacing.xl};
+`;
+
+const LegendItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing.sm};
+`;
+
+const LegendColor = styled.div`
+  width: 16px;
+  height: 16px;
+  border-radius: ${props => props.theme.borderRadius.sm};
+  background-color: ${props => props.color};
+`;
+
+const UpcomingEvents = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${props => props.theme.spacing.md};
+`;
+
+const EventItem = styled.div`
+  padding: ${props => props.theme.spacing.md};
+  background-color: ${props => props.theme.colors.background};
+  border-radius: ${props => props.theme.borderRadius.md};
+  border-left: 3px solid ${props => props.theme.colors.primary};
+`;
+
+const EventTitle = styled.div`
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.spacing.xs};
+`;
+
+const EventDetails = styled.div`
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.theme.colors.textSecondary};
+  margin-bottom: ${props => props.theme.spacing.sm};
+`;
+
+const EventActions = styled.div`
+  display: flex;
+  gap: ${props => props.theme.spacing.xs};
+`;
+
+const EventAction = styled.button`
+  background: none;
+  border: 1px solid ${props => props.theme.colors.border};
+  padding: 2px 6px;
+  border-radius: ${props => props.theme.borderRadius.sm};
+  font-size: ${props => props.theme.typography.fontSizes.xs};
+  cursor: pointer;
+  transition: all ${props => props.theme.transitions.normal};
+  
+  &:hover {
+    background-color: ${props => props.theme.colors.primary};
+    color: ${props => props.theme.colors.white};
+    border-color: ${props => props.theme.colors.primary};
+  }
+`;
 
 const LandlordTenantCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -75,10 +327,18 @@ const LandlordTenantCalendar = () => {
     
     for (let i = 0; i < totalCells; i++) {
       const dayNumber = i - startingDay + 1;
-      const date = new Date(currentYear, currentMonth, dayNumber);
       const isOtherMonth = dayNumber < 1 || dayNumber > daysInMonth;
-      const isToday = date.toDateString() === today.toDateString();
-      const dayEvents = isOtherMonth ? [] : getEventsForDate(date);
+      
+      // Only create date object for valid days
+      let date = null;
+      let isToday = false;
+      let dayEvents = [];
+      
+      if (!isOtherMonth) {
+        date = new Date(currentYear, currentMonth, dayNumber);
+        isToday = date.toDateString() === today.toDateString();
+        dayEvents = getEventsForDate(date);
+      }
       
       calendar.push({
         day: dayNumber,
@@ -100,17 +360,6 @@ const LandlordTenantCalendar = () => {
     });
   };
 
-  const getEventTypeClass = (type) => {
-    const typeMap = {
-      'move-in': 'event-move-in',
-      'move-out': 'event-move-out',
-      'maintenance': 'event-maintenance',
-      'viewing': 'event-viewing',
-      'payment': 'event-payment'
-    };
-    return typeMap[type] || 'event-move-in';
-  };
-
   const getEventTypeColor = (type) => {
     const colorMap = {
       'move-in': '#d1fae5',
@@ -127,142 +376,118 @@ const LandlordTenantCalendar = () => {
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .slice(0, 5);
 
-  return (
-    <div className="calendar-container">
-      <header className="calendar-header">
-        <div className="header-content">
-          <div className="logo">Wild Welcome</div>
-          <nav className="landlord-nav">
-            <Link to="/landlord/dashboard" className="nav-link">Dashboard</Link>
-            <Link to="/landlord/properties" className="nav-link">Properties</Link>
-            <Link to="/landlord/calendar" className="nav-link active">Calendar</Link>
-            <Link to="/landlord/bookings" className="nav-link">Bookings</Link>
-            <Link to="/landlord/account" className="nav-link">Account</Link>
-          </nav>
-          <div className="user-menu">
-            <div className="user-avatar">LS</div>
-          </div>
-        </div>
-      </header>
+  const calendarData = renderCalendar();
 
-      <div className="calendar-content">
-        <div className="page-header">
-          <h1 className="page-title">Tenant Calendar</h1>
-          <div className="calendar-controls">
-            <div className="calendar-nav">
-              <button className="nav-button" onClick={() => navigateMonth(-1)}>
-                ←
-              </button>
-              <span className="current-month">{getMonthName(currentDate)}</span>
-              <button className="nav-button" onClick={() => navigateMonth(1)}>
-                →
-              </button>
-            </div>
-            <div className="view-toggle">
-              <button 
-                className={`view-button ${viewMode === 'month' ? 'active' : ''}`}
+  return (
+    <CalendarContainer>
+      <Header userType="landlord" userInitials="LS" />
+      
+      <MainContent>
+        <PageHeader>
+          <PageTitle>Tenant Calendar</PageTitle>
+          <CalendarControls>
+            <CalendarNav>
+              <NavButton onClick={() => navigateMonth(-1)}>←</NavButton>
+              <CurrentMonth>{getMonthName(currentDate)}</CurrentMonth>
+              <NavButton onClick={() => navigateMonth(1)}>→</NavButton>
+            </CalendarNav>
+            <ViewToggle>
+              <ViewButton 
+                isActive={viewMode === 'month'}
                 onClick={() => setViewMode('month')}
               >
                 Month
-              </button>
-              <button 
-                className={`view-button ${viewMode === 'week' ? 'active' : ''}`}
+              </ViewButton>
+              <ViewButton 
+                isActive={viewMode === 'week'}
                 onClick={() => setViewMode('week')}
               >
                 Week
-              </button>
-            </div>
-          </div>
-        </div>
+              </ViewButton>
+            </ViewToggle>
+          </CalendarControls>
+        </PageHeader>
 
-        <div style={{ display: 'flex', gap: '2rem' }}>
-          <div className="calendar-main" style={{ flex: 1 }}>
-            <div className="calendar-grid">
-              <div className="calendar-header-row">
-                <div className="calendar-header-cell">Sun</div>
-                <div className="calendar-header-cell">Mon</div>
-                <div className="calendar-header-cell">Tue</div>
-                <div className="calendar-header-cell">Wed</div>
-                <div className="calendar-header-cell">Thu</div>
-                <div className="calendar-header-cell">Fri</div>
-                <div className="calendar-header-cell">Sat</div>
-              </div>
+        <ContentGrid>
+          <CalendarMain>
+            <CalendarGrid>
+              <CalendarHeaderCell>Sun</CalendarHeaderCell>
+              <CalendarHeaderCell>Mon</CalendarHeaderCell>
+              <CalendarHeaderCell>Tue</CalendarHeaderCell>
+              <CalendarHeaderCell>Wed</CalendarHeaderCell>
+              <CalendarHeaderCell>Thu</CalendarHeaderCell>
+              <CalendarHeaderCell>Fri</CalendarHeaderCell>
+              <CalendarHeaderCell>Sat</CalendarHeaderCell>
               
-              {Array.from({ length: 6 }, (_, weekIndex) => (
-                <div key={weekIndex} className="calendar-row">
-                  {Array.from({ length: 7 }, (_, dayIndex) => {
-                    const cellIndex = weekIndex * 7 + dayIndex;
-                    const cell = renderCalendar()[cellIndex];
-                    
-                    return (
-                      <div 
-                        key={dayIndex} 
-                        className={`calendar-cell ${cell.isOtherMonth ? 'other-month' : ''} ${cell.isToday ? 'today' : ''}`}
-                      >
-                        <div className="calendar-date">{cell.day}</div>
-                        <div className="calendar-events">
+              {calendarData.map((cell, index) => (
+                <CalendarCell
+                  key={index}
+                  isOtherMonth={cell.isOtherMonth}
+                  isToday={cell.isToday}
+                >
+                  <CalendarDate isOtherMonth={cell.isOtherMonth}>
+                    {cell.day > 0 ? cell.day : ''}
+                  </CalendarDate>
+                  <CalendarEvents>
                           {cell.events.map(event => (
-                            <div 
+                      <CalendarEvent
                               key={event.id}
-                              className={`calendar-event ${getEventTypeClass(event.type)}`}
+                        color={getEventTypeColor(event.type)}
                               title={event.title}
                             >
                               {event.title}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      </CalendarEvent>
+                    ))}
+                  </CalendarEvents>
+                </CalendarCell>
               ))}
-            </div>
-          </div>
+            </CalendarGrid>
+          </CalendarMain>
 
-          <div className="calendar-sidebar">
-            <h3 className="sidebar-title">Event Legend</h3>
-            <div className="event-legend">
-              <div className="legend-item">
-                <div className="legend-color" style={{ background: '#d1fae5' }}></div>
+          <CalendarSidebar>
+            <SidebarTitle>Event Legend</SidebarTitle>
+            <EventLegend>
+              <LegendItem>
+                <LegendColor color="#d1fae5" />
                 <span>Move-in</span>
-              </div>
-              <div className="legend-item">
-                <div className="legend-color" style={{ background: '#fee2e2' }}></div>
+              </LegendItem>
+              <LegendItem>
+                <LegendColor color="#fee2e2" />
                 <span>Move-out</span>
-              </div>
-              <div className="legend-item">
-                <div className="legend-color" style={{ background: '#fef3c7' }}></div>
+              </LegendItem>
+              <LegendItem>
+                <LegendColor color="#fef3c7" />
                 <span>Maintenance</span>
-              </div>
-              <div className="legend-item">
-                <div className="legend-color" style={{ background: '#dbeafe' }}></div>
+              </LegendItem>
+              <LegendItem>
+                <LegendColor color="#dbeafe" />
                 <span>Viewing</span>
-              </div>
-              <div className="legend-item">
-                <div className="legend-color" style={{ background: '#f3e8ff' }}></div>
+              </LegendItem>
+              <LegendItem>
+                <LegendColor color="#f3e8ff" />
                 <span>Payment</span>
-              </div>
-            </div>
+              </LegendItem>
+            </EventLegend>
 
-            <h3 className="sidebar-title">Upcoming Events</h3>
-            <div className="upcoming-events">
+            <SidebarTitle>Upcoming Events</SidebarTitle>
+            <UpcomingEvents>
               {upcomingEvents.map(event => (
-                <div key={event.id} className="event-item">
-                  <div className="event-title">{event.title}</div>
-                  <div className="event-details">
+                <EventItem key={event.id}>
+                  <EventTitle>{event.title}</EventTitle>
+                  <EventDetails>
                     {new Date(event.date).toLocaleDateString()} • {event.property}
-                  </div>
-                  <div className="event-actions">
-                    <button className="event-action view-action">View</button>
-                    <button className="event-action edit-action">Edit</button>
-                  </div>
-                </div>
+                  </EventDetails>
+                  <EventActions>
+                    <EventAction>View</EventAction>
+                    <EventAction>Edit</EventAction>
+                  </EventActions>
+                </EventItem>
               ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </UpcomingEvents>
+          </CalendarSidebar>
+        </ContentGrid>
+      </MainContent>
+    </CalendarContainer>
   );
 };
 

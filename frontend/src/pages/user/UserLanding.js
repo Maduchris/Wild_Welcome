@@ -1,32 +1,38 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import ThemeToggle from '../../components/ui/ThemeToggle';
+import styled from 'styled-components';
+import Header from '../../components/ui/Header';
 import './UserLanding.css';
+
+const UserLandingContainer = styled.div`
+  min-height: 100vh;
+  background-color: ${props => props.theme.colors.background};
+`;
 
 const featuredRooms = [
   {
     id: 1,
-    title: "Cozy Studio in Downtown",
-    location: "Downtown, City Center",
-    price: "$1,200/month",
+    title: "Cozy Studio in Kigali City Center",
+    location: "Kigali, Rwanda",
+    price: "$120/month",
     features: ["Private Bathroom", "Kitchen", "WiFi"],
     image: "/images/room1.jpg",
     imageAlt: "Cozy studio room with modern decor"
   },
   {
     id: 2,
-    title: "Modern Room with View",
-    location: "University District",
-    price: "$800/month",
+    title: "Modern Room in Remera",
+    location: "Remera, Kigali",
+    price: "$180/month",
     features: ["Shared Bathroom", "Balcony", "Furnished"],
     image: "/images/room2.jpg",
     imageAlt: "Modern room with large window and city view"
   },
   {
     id: 3,
-    title: "Luxury Apartment Suite",
-    location: "Riverside Area",
-    price: "$1,500/month",
+    title: "Luxury Apartment in Nyarutarama",
+    location: "Nyarutarama, Kigali",
+    price: "$350/month",
     features: ["Private Bathroom", "Gym Access", "Parking"],
     image: "/images/room3.jpg",
     imageAlt: "Luxury apartment suite with elegant furnishings"
@@ -73,24 +79,8 @@ const UserLanding = () => {
   };
 
   return (
-    <div className="user-landing-container">
-      <header className="user-landing-header">
-        <div className="header-content">
-          <div className="logo">
-            <img src="/images/wild-welcome-logo.png" alt="Wild Welcome Logo" className="logo-image" />
-          </div>
-          <nav className="user-nav">
-            <Link to="/user/search" className="nav-link">Search</Link>
-            <Link to="/user/favourites" className="nav-link">Favourites</Link>
-            <Link to="/user/applications" className="nav-link">Applications</Link>
-            <Link to="/user/account" className="nav-link">Account</Link>
-          </nav>
-          <div className="user-menu">
-            <ThemeToggle />
-            <div className="user-avatar" tabIndex={0} aria-label="User initials">JD</div>
-          </div>
-        </div>
-      </header>
+    <UserLandingContainer>
+      <Header userType="user" userInitials="JD" />
 
       <section className="hero-section">
         <div className="hero-content">
@@ -192,35 +182,56 @@ const UserLanding = () => {
           {testimonials.map((t, idx) => (
             <div className="testimonial-card" key={idx}>
               <img src={t.avatar} alt={t.name + ' avatar'} className="testimonial-avatar" loading="lazy" />
-              <blockquote className="testimonial-quote">“{t.quote}”</blockquote>
+              <blockquote className="testimonial-quote">"{t.quote}"</blockquote>
               <div className="testimonial-name">{t.name}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <footer className="footer">
+      <footer className="user-landing-footer">
         <div className="footer-content">
-          <div className="footer-logo">
-            <img src="/images/wild-welcome-logo.png" alt="Wild Welcome Logo" className="footer-logo-image" />
+          <div className="footer-section">
+            <div className="footer-logo">
+              <img src="/images/wild-welcome-logo.png" alt="Wild Welcome Logo" className="footer-logo-image" />
+            </div>
+            <p className="footer-description">
+              Making room finding simple, transparent, and enjoyable for everyone.
+            </p>
           </div>
-          <nav className="footer-nav">
-            <Link to="/user" className="footer-link">Home</Link>
-            <Link to="/user/search" className="footer-link">Search</Link>
-            <Link to="/user/favourites" className="footer-link">Favourites</Link>
-            <Link to="/user/account" className="footer-link">Account</Link>
-          </nav>
-          <div className="footer-social">
-            <a href="#" className="footer-social-icon" aria-label="Instagram"><span role="img" aria-label="Instagram">📸</span></a>
-            <a href="#" className="footer-social-icon" aria-label="Twitter"><span role="img" aria-label="Twitter">🐦</span></a>
-            <a href="#" className="footer-social-icon" aria-label="Facebook"><span role="img" aria-label="Facebook">📘</span></a>
+          <div className="footer-section">
+            <h3 className="footer-title">Quick Links</h3>
+            <ul className="footer-links">
+              <li><Link to="/user/search">Search Rooms</Link></li>
+              <li><Link to="/user/favourites">Favourites</Link></li>
+              <li><Link to="/user/applications">Applications</Link></li>
+              <li><Link to="/user/account">Account</Link></li>
+            </ul>
+          </div>
+          <div className="footer-section">
+            <h3 className="footer-title">Support</h3>
+            <ul className="footer-links">
+              <li><a href="#help">Help Center</a></li>
+              <li><a href="#contact">Contact Us</a></li>
+              <li><a href="#faq">FAQ</a></li>
+              <li><a href="#terms">Terms of Service</a></li>
+            </ul>
+          </div>
+          <div className="footer-section">
+            <h3 className="footer-title">Connect</h3>
+            <ul className="footer-links">
+              <li><a href="#facebook">Facebook</a></li>
+              <li><a href="#twitter">Twitter</a></li>
+              <li><a href="#instagram">Instagram</a></li>
+              <li><a href="#linkedin">LinkedIn</a></li>
+            </ul>
           </div>
         </div>
         <div className="footer-bottom">
-          &copy; {new Date().getFullYear()} Wild Welcome. All rights reserved.
+          <p>&copy; 2024 Wild Welcome. All rights reserved.</p>
         </div>
       </footer>
-    </div>
+    </UserLandingContainer>
   );
 };
 

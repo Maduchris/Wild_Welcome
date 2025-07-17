@@ -64,6 +64,7 @@ class User(UserBase):
         populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
+        from_attributes = True
 
 
 class UserLogin(BaseModel):
@@ -73,7 +74,12 @@ class UserLogin(BaseModel):
 
 class Token(BaseModel):
     access_token: str
+    refresh_token: Optional[str] = None
     token_type: str
+
+
+class TokenRefresh(BaseModel):
+    refresh_token: str
 
 
 class TokenData(BaseModel):

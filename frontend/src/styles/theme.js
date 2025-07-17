@@ -1,34 +1,41 @@
 // Light Theme
 export const lightTheme = {
   colors: {
-    primary: '#EEC170',
-    primaryDark: '#86571F',
-    primaryLight: '#AFBE8E',
-    secondary: '#295135',
-    accent: '#AFBE8E',
-    brown: '#86571F',
-    offWhite: '#F9F7F3',
-    black: '#000000',
-    white: '#FFFFFF',
-    success: '#295135',
-    error: '#86571F',
-    warning: '#EEC170',
-    background: '#F9F7F3',
-    surface: '#FFFFFF',
-    text: '#000000',
-    textSecondary: '#295135',
-    border: '#AFBE8E',
-    borderLight: '#F9F7F3',
-    landingGradient: 'linear-gradient(135deg, #EEC170 0%, #86571F 100%)',
-    textLight: '#AFBE8E',
+    primary: '#295135', // Dark green as primary
+    primaryDark: '#1A3A26', // Darker shade of primary
+    primaryLight: '#3B6B4A', // Lighter shade of primary
+    secondary: '#AFBE8E', // Sage green as secondary
+    accent: '#EEC170', // Golden yellow as accent
+    brown: '#86571F', // Brown
+    offWhite: '#F9F7F3', // Off-white
+    black: '#000000', // Black
+    white: '#FFFFFF', // Pure white
+    success: '#AFBE8E', // Using sage green for success
+    error: '#D32F2F', // Red for errors
+    warning: '#EEC170', // Using golden yellow for warnings
+    background: '#F9F7F3', // Off-white background
+    surface: '#FFFFFF', // White surface
+    text: '#000000', // Black text
+    textSecondary: '#295135', // Dark green for secondary text
+    border: '#AFBE8E', // Sage green borders
+    borderLight: '#EEC170', // Golden yellow light borders
+    landingGradient: 'linear-gradient(135deg, #295135 0%, #AFBE8E 100%)',
+    textLight: '#295135', // Dark green for light text
     gray: {
-      100: '#F9F7F3',
-      500: '#AFBE8E',
+      100: '#F9F7F3', // Off-white
+      200: '#EEC170', // Golden yellow
+      300: '#AFBE8E', // Sage green
+      400: '#86571F', // Brown
+      500: '#295135', // Dark green
+      600: '#1A3A26', // Darker green
+      700: '#000000', // Black
+      800: '#000000', // Black
+      900: '#000000', // Black
     },
     // Additional colors for better theme support
     cardBackground: '#FFFFFF',
-    inputBackground: '#FFFFFF',
-    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    inputBackground: '#F9F7F3',
+    shadowColor: 'rgba(41, 81, 53, 0.1)', // Dark green with opacity
     overlayColor: 'rgba(0, 0, 0, 0.5)',
   },
   
@@ -51,10 +58,10 @@ export const lightTheme = {
   },
   
   shadows: {
-    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-    md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
-    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
-    xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+    sm: '0 1px 2px 0 rgba(41, 81, 53, 0.1)',
+    md: '0 4px 6px -1px rgba(41, 81, 53, 0.15), 0 2px 4px -2px rgba(41, 81, 53, 0.1)',
+    lg: '0 10px 15px -3px rgba(41, 81, 53, 0.15), 0 4px 6px -4px rgba(41, 81, 53, 0.1)',
+    xl: '0 20px 25px -5px rgba(41, 81, 53, 0.15), 0 8px 10px -6px rgba(41, 81, 53, 0.1)',
   },
   
   typography: {
@@ -113,33 +120,40 @@ export const lightTheme = {
 // Dark Theme
 export const darkTheme = {
   colors: {
-    primary: '#EEC170',
-    primaryDark: '#86571F',
-    primaryLight: '#AFBE8E',
-    secondary: '#295135',
-    accent: '#AFBE8E',
-    brown: '#86571F',
-    offWhite: '#1a1a1a',
-    black: '#FFFFFF',
-    white: '#000000',
-    success: '#4ade80',
-    error: '#f87171',
-    warning: '#fbbf24',
-    background: '#0f0f0f',
-    surface: '#1a1a1a',
-    text: '#FFFFFF',
-    textSecondary: '#EEC170',
-    border: '#333333',
-    borderLight: '#1a1a1a',
-    landingGradient: 'linear-gradient(135deg, #295135 0%, #86571F 100%)',
-    textLight: '#AFBE8E',
+    primary: '#AFBE8E', // Sage green as primary in dark mode
+    primaryDark: '#8FA876', // Darker sage green
+    primaryLight: '#C5D1A8', // Lighter sage green
+    secondary: '#EEC170', // Golden yellow as secondary
+    accent: '#86571F', // Brown as accent
+    brown: '#EEC170', // Golden yellow (inverted brown)
+    offWhite: '#000000', // Black (inverted)
+    black: '#F9F7F3', // Off-white (inverted)
+    white: '#000000', // Black (inverted)
+    success: '#AFBE8E', // Sage green for success
+    error: '#FF6B6B', // Light red for errors
+    warning: '#EEC170', // Golden yellow for warnings
+    background: '#000000', // Black background
+    surface: '#1A1A1A', // Dark gray surface
+    text: '#F9F7F3', // Off-white text
+    textSecondary: '#AFBE8E', // Sage green for secondary text
+    border: '#295135', // Dark green borders
+    borderLight: '#86571F', // Brown light borders
+    landingGradient: 'linear-gradient(135deg, #AFBE8E 0%, #EEC170 100%)',
+    textLight: '#AFBE8E', // Sage green for light text
     gray: {
-      100: '#1a1a1a',
-      500: '#333333',
+      100: '#000000', // Black
+      200: '#1A1A1A', // Dark gray
+      300: '#295135', // Dark green
+      400: '#86571F', // Brown
+      500: '#EEC170', // Golden yellow
+      600: '#AFBE8E', // Sage green
+      700: '#C5D1A8', // Light sage green
+      800: '#F9F7F3', // Off-white
+      900: '#FFFFFF', // White
     },
     // Additional colors for better theme support
-    cardBackground: '#1a1a1a',
-    inputBackground: '#0f0f0f',
+    cardBackground: '#1A1A1A',
+    inputBackground: '#000000',
     shadowColor: 'rgba(0, 0, 0, 0.3)',
     overlayColor: 'rgba(0, 0, 0, 0.7)',
   },

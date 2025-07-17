@@ -1,57 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import Header from '../../components/ui/Header';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Card from '../../components/ui/Card';
+import ProfileImageUpload from '../../components/ui/ProfileImageUpload';
 
 const AccountContainer = styled.div`
   min-height: 100vh;
   background-color: ${props => props.theme.colors.background};
-`;
-
-const Header = styled.header`
-  background-color: ${props => props.theme.colors.white};
-  border-bottom: 1px solid ${props => props.theme.colors.border};
-  padding: ${props => props.theme.spacing.lg} 0;
-  position: sticky;
-  top: 0;
-  z-index: ${props => props.theme.zIndex.sticky};
-`;
-
-const HeaderContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 ${props => props.theme.spacing.xl};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const Logo = styled(Link)`
-  font-size: ${props => props.theme.typography.fontSizes['2xl']};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
-  color: ${props => props.theme.colors.primary};
-  text-decoration: none;
-`;
-
-const Nav = styled.nav`
-  display: flex;
-  gap: ${props => props.theme.spacing.xl};
-  align-items: center;
-`;
-
-const NavLink = styled(Link)`
-  color: ${props => props.theme.colors.text};
-  text-decoration: none;
-  font-weight: ${props => props.theme.typography.fontWeights.medium};
-  transition: color ${props => props.theme.transitions.normal};
-  
-  &:hover {
-    color: ${props => props.theme.colors.primary};
-  }
 `;
 
 const MainContent = styled.main`
@@ -82,20 +41,6 @@ const Sidebar = styled.div``;
 const ProfileCard = styled(Card)`
   text-align: center;
   margin-bottom: ${props => props.theme.spacing.xl};
-`;
-
-const Avatar = styled.div`
-  width: 100px;
-  height: 100px;
-  background-color: ${props => props.theme.colors.primary};
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto ${props => props.theme.spacing.lg};
-  color: ${props => props.theme.colors.white};
-  font-size: ${props => props.theme.typography.fontSizes['2xl']};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
 `;
 
 const UserName = styled.h3`
@@ -203,7 +148,7 @@ const NotificationTitle = styled.h4`
   font-size: ${props => props.theme.typography.fontSizes.base};
   font-weight: ${props => props.theme.typography.fontWeights.medium};
   color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.xs};
+  margin: 0 0 ${props => props.theme.spacing.xs} 0;
 `;
 
 const NotificationDescription = styled.p`
@@ -212,7 +157,7 @@ const NotificationDescription = styled.p`
   margin: 0;
 `;
 
-const Toggle = styled.label`
+const ToggleSwitch = styled.label`
   position: relative;
   display: inline-block;
   width: 50px;
@@ -240,8 +185,8 @@ const ToggleSlider = styled.span`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${props => props.theme.colors.gray[300]};
-  transition: .4s;
+  background-color: ${props => props.theme.colors.border};
+  transition: ${props => props.theme.transitions.normal};
   border-radius: 24px;
   
   &:before {
@@ -252,115 +197,130 @@ const ToggleSlider = styled.span`
     left: 3px;
     bottom: 3px;
     background-color: white;
-    transition: .4s;
+    transition: ${props => props.theme.transitions.normal};
     border-radius: 50%;
   }
 `;
 
+const SecurityItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: ${props => props.theme.spacing.lg};
+  background-color: ${props => props.theme.colors.surface};
+  border-radius: ${props => props.theme.borderRadius.md};
+  margin-bottom: ${props => props.theme.spacing.md};
+`;
+
+const SecurityInfo = styled.div``;
+
+const SecurityTitle = styled.h4`
+  font-size: ${props => props.theme.typography.fontSizes.base};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  color: ${props => props.theme.colors.text};
+  margin: 0 0 ${props => props.theme.spacing.xs} 0;
+`;
+
+const SecurityDescription = styled.p`
+  font-size: ${props => props.theme.typography.fontSizes.sm};
+  color: ${props => props.theme.colors.textSecondary};
+  margin: 0;
+`;
+
 const UserAccount = () => {
   const [activeTab, setActiveTab] = useState('profile');
-  const [isLoading, setIsLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
   const [notifications, setNotifications] = useState({
-    emailNotifications: true,
-    smsNotifications: false,
-    bookingUpdates: true,
-    newListings: true,
-    promotionalEmails: false,
+    email: true,
+    push: false,
+    sms: true,
+    marketing: false
   });
-  
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@example.com',
+      phone: '+1 (555) 123-4567',
+      address: '123 Main St, City, State 12345'
+    }
+  });
 
   const handleProfileUpdate = async (data) => {
-    setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
       console.log('Profile update data:', data);
+      // Here you would typically send the data to your backend
       alert('Profile updated successfully!');
     } catch (error) {
-      console.error('Profile update error:', error);
-    } finally {
-      setIsLoading(false);
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile. Please try again.');
     }
   };
 
   const handleNotificationToggle = (key) => {
     setNotifications(prev => ({
       ...prev,
-      [key]: !prev[key],
+      [key]: !prev[key]
     }));
+  };
+
+  const handleProfileImageChange = (file, previewUrl) => {
+    console.log('Profile image changed:', file);
+    setProfileImage(previewUrl);
+    // Here you would typically upload the file to your backend
+  };
+
+  const handleProfileImageRemove = () => {
+    setProfileImage(null);
+    // Here you would typically remove the image from your backend
   };
 
   const renderProfileTab = () => (
     <Section>
-      <SectionTitle>Personal Information</SectionTitle>
+      <SectionTitle>Profile Information</SectionTitle>
       <Form onSubmit={handleSubmit(handleProfileUpdate)}>
         <Row>
           <Input
             label="First Name"
-            placeholder="Enter your first name"
-            defaultValue="John"
-            {...register('firstName', {
-              required: 'First name is required',
-            })}
+            {...register('firstName', { required: 'First name is required' })}
             error={errors.firstName?.message}
           />
           <Input
             label="Last Name"
-            placeholder="Enter your last name"
-            defaultValue="Doe"
-            {...register('lastName', {
-              required: 'Last name is required',
-            })}
+            {...register('lastName', { required: 'Last name is required' })}
             error={errors.lastName?.message}
           />
         </Row>
-        
+        <Row>
         <Input
           label="Email Address"
           type="email"
-          placeholder="Enter your email"
-          defaultValue="john.doe@email.com"
           {...register('email', {
             required: 'Email is required',
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: 'Invalid email address',
-            },
+                message: 'Invalid email address'
+              }
           })}
           error={errors.email?.message}
         />
-        
         <Input
           label="Phone Number"
-          type="tel"
-          placeholder="Enter your phone number"
-          defaultValue="+1 (555) 123-4567"
-          {...register('phone', {
-            required: 'Phone number is required',
-          })}
+            {...register('phone')}
           error={errors.phone?.message}
         />
-        
+        </Row>
         <Input
-          label="Date of Birth"
-          type="date"
-          defaultValue="1990-01-01"
-          {...register('dateOfBirth', {
-            required: 'Date of birth is required',
-          })}
-          error={errors.dateOfBirth?.message}
+          label="Address"
+          {...register('address')}
+          error={errors.address?.message}
         />
-        
         <ButtonGroup>
-          <Button type="submit" loading={isLoading}>
+          <Button type="submit" variant="primary">
             Save Changes
           </Button>
-          <Button variant="outline" type="button">
+          <Button type="button" variant="outline">
             Cancel
           </Button>
         </ButtonGroup>
@@ -375,76 +335,69 @@ const UserAccount = () => {
         <NotificationItem>
           <NotificationInfo>
             <NotificationTitle>Email Notifications</NotificationTitle>
-            <NotificationDescription>Receive updates via email</NotificationDescription>
+            <NotificationDescription>
+              Receive notifications about bookings, messages, and updates via email
+            </NotificationDescription>
           </NotificationInfo>
-          <Toggle>
+          <ToggleSwitch>
             <ToggleInput
               type="checkbox"
-              checked={notifications.emailNotifications}
-              onChange={() => handleNotificationToggle('emailNotifications')}
+              checked={notifications.email}
+              onChange={() => handleNotificationToggle('email')}
             />
             <ToggleSlider />
-          </Toggle>
+          </ToggleSwitch>
+        </NotificationItem>
+        
+        <NotificationItem>
+          <NotificationInfo>
+            <NotificationTitle>Push Notifications</NotificationTitle>
+            <NotificationDescription>
+              Receive push notifications on your device
+            </NotificationDescription>
+          </NotificationInfo>
+          <ToggleSwitch>
+            <ToggleInput
+              type="checkbox"
+              checked={notifications.push}
+              onChange={() => handleNotificationToggle('push')}
+            />
+            <ToggleSlider />
+          </ToggleSwitch>
         </NotificationItem>
         
         <NotificationItem>
           <NotificationInfo>
             <NotificationTitle>SMS Notifications</NotificationTitle>
-            <NotificationDescription>Receive updates via text message</NotificationDescription>
+            <NotificationDescription>
+              Receive important updates via text message
+            </NotificationDescription>
           </NotificationInfo>
-          <Toggle>
+          <ToggleSwitch>
             <ToggleInput
               type="checkbox"
-              checked={notifications.smsNotifications}
-              onChange={() => handleNotificationToggle('smsNotifications')}
+              checked={notifications.sms}
+              onChange={() => handleNotificationToggle('sms')}
             />
             <ToggleSlider />
-          </Toggle>
+          </ToggleSwitch>
         </NotificationItem>
         
         <NotificationItem>
           <NotificationInfo>
-            <NotificationTitle>Booking Updates</NotificationTitle>
-            <NotificationDescription>Get notified about your booking status</NotificationDescription>
+            <NotificationTitle>Marketing Communications</NotificationTitle>
+            <NotificationDescription>
+              Receive promotional offers and newsletters
+            </NotificationDescription>
           </NotificationInfo>
-          <Toggle>
+          <ToggleSwitch>
             <ToggleInput
               type="checkbox"
-              checked={notifications.bookingUpdates}
-              onChange={() => handleNotificationToggle('bookingUpdates')}
+              checked={notifications.marketing}
+              onChange={() => handleNotificationToggle('marketing')}
             />
             <ToggleSlider />
-          </Toggle>
-        </NotificationItem>
-        
-        <NotificationItem>
-          <NotificationInfo>
-            <NotificationTitle>New Listings</NotificationTitle>
-            <NotificationDescription>Get notified about new properties</NotificationDescription>
-          </NotificationInfo>
-          <Toggle>
-            <ToggleInput
-              type="checkbox"
-              checked={notifications.newListings}
-              onChange={() => handleNotificationToggle('newListings')}
-            />
-            <ToggleSlider />
-          </Toggle>
-        </NotificationItem>
-        
-        <NotificationItem>
-          <NotificationInfo>
-            <NotificationTitle>Promotional Emails</NotificationTitle>
-            <NotificationDescription>Receive special offers and promotions</NotificationDescription>
-          </NotificationInfo>
-          <Toggle>
-            <ToggleInput
-              type="checkbox"
-              checked={notifications.promotionalEmails}
-              onChange={() => handleNotificationToggle('promotionalEmails')}
-            />
-            <ToggleSlider />
-          </Toggle>
+          </ToggleSwitch>
         </NotificationItem>
       </NotificationSettings>
     </Section>
@@ -453,78 +406,62 @@ const UserAccount = () => {
   const renderSecurityTab = () => (
     <Section>
       <SectionTitle>Security Settings</SectionTitle>
-      <Form>
-        <Input
-          label="Current Password"
-          type="password"
-          placeholder="Enter your current password"
-          {...register('currentPassword', {
-            required: 'Current password is required',
-          })}
-          error={errors.currentPassword?.message}
-        />
-        
-        <Input
-          label="New Password"
-          type="password"
-          placeholder="Enter your new password"
-          {...register('newPassword', {
-            required: 'New password is required',
-            minLength: {
-              value: 8,
-              message: 'Password must be at least 8 characters',
-            },
-          })}
-          error={errors.newPassword?.message}
-        />
-        
-        <Input
-          label="Confirm New Password"
-          type="password"
-          placeholder="Confirm your new password"
-          {...register('confirmPassword', {
-            required: 'Please confirm your password',
-          })}
-          error={errors.confirmPassword?.message}
-        />
-        
-        <ButtonGroup>
-          <Button type="submit">
-            Update Password
+      <SecurityItem>
+        <SecurityInfo>
+          <SecurityTitle>Change Password</SecurityTitle>
+          <SecurityDescription>
+            Update your password to keep your account secure
+          </SecurityDescription>
+        </SecurityInfo>
+        <Button variant="outline" size="sm">
+          Change
+        </Button>
+      </SecurityItem>
+      
+      <SecurityItem>
+        <SecurityInfo>
+          <SecurityTitle>Two-Factor Authentication</SecurityTitle>
+          <SecurityDescription>
+            Add an extra layer of security to your account
+          </SecurityDescription>
+        </SecurityInfo>
+        <Button variant="outline" size="sm">
+          Enable
+        </Button>
+      </SecurityItem>
+      
+      <SecurityItem>
+        <SecurityInfo>
+          <SecurityTitle>Login History</SecurityTitle>
+          <SecurityDescription>
+            View recent login activity and device information
+          </SecurityDescription>
+        </SecurityInfo>
+        <Button variant="outline" size="sm">
+          View
           </Button>
-          <Button variant="outline" type="button">
-            Cancel
-          </Button>
-        </ButtonGroup>
-      </Form>
+      </SecurityItem>
     </Section>
   );
 
   return (
     <AccountContainer>
-      <Header>
-        <HeaderContent>
-          <Logo to="/user">
-            <img src="/images/wild-welcome-logo.png" alt="Wild Welcome Logo" style={{ height: '28px', width: 'auto' }} />
-          </Logo>
-          <Nav>
-            <NavLink to="/user/search">Search</NavLink>
-            <NavLink to="/user/favourites">Favourites</NavLink>
-            <NavLink to="/user/applications">Applications</NavLink>
-            <NavLink to="/user/account">Account</NavLink>
-          </Nav>
-        </HeaderContent>
-      </Header>
+      <Header userType="user" userInitials="JD" profileImage={profileImage} />
 
       <MainContent>
-        <PageTitle>My Account</PageTitle>
+        <PageTitle>Account Settings</PageTitle>
 
         <ContentGrid>
           <Sidebar>
             <ProfileCard>
-              <Avatar>JD</Avatar>
+              <ProfileImageUpload
+                currentImage={profileImage}
+                userInitials="JD"
+                onImageChange={handleProfileImageChange}
+                onRemoveImage={handleProfileImageRemove}
+              />
               <UserName>John Doe</UserName>
-              <UserEmail>john.doe@email.com</UserEmail>
+              <UserEmail>john.doe@example.com</UserEmail>
             </ProfileCard>
 
             <MenuCard>

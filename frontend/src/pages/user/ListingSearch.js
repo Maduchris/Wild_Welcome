@@ -280,57 +280,136 @@ const ListingSearch = () => {
   const mockListings = [
     {
       id: 1,
-      title: 'Cozy Studio in Downtown',
-      location: 'Downtown, New York',
-      price: 1200,
+      title: 'Cozy Studio in Kigali City Center',
+      location: 'Kigali, Rwanda',
+      price: 120,
       features: ['Furnished', 'Private Bath'],
       image: '🏠',
     },
     {
       id: 2,
-      title: 'Modern 2BR Apartment',
-      location: 'Brooklyn Heights',
-      price: 2100,
+      title: 'Modern 2BR Apartment in Remera',
+      location: 'Remera, Kigali',
+      price: 280,
       features: ['Parking', 'Gym'],
       image: '🏢',
     },
     {
       id: 3,
-      title: 'Charming Room in Brownstone',
-      location: 'Upper West Side',
-      price: 1500,
+      title: 'Charming Room in Kimihurura',
+      location: 'Kimihurura, Kigali',
+      price: 150,
       features: ['Pet Friendly', 'WiFi'],
       image: '🏘️',
     },
     {
       id: 4,
-      title: 'Luxury Penthouse Suite',
-      location: 'Manhattan',
-      price: 3500,
+      title: 'Luxury Suite in Nyarutarama',
+      location: 'Nyarutarama, Kigali',
+      price: 450,
       features: ['Furnished', 'Parking', 'Gym'],
       image: '🏙️',
     },
     {
       id: 5,
-      title: 'Student-Friendly Room',
-      location: 'Near University',
-      price: 900,
+      title: 'Student-Friendly Room Near University',
+      location: 'Kacyiru, Kigali',
+      price: 90,
       features: ['WiFi', 'Study Area'],
       image: '🎓',
     },
     {
       id: 6,
-      title: 'Family Home Room',
-      location: 'Queens',
-      price: 1300,
+      title: 'Family Home Room in Gisozi',
+      location: 'Gisozi, Kigali',
+      price: 130,
       features: ['Pet Friendly', 'Garden'],
+      image: '🏡',
+    },
+    {
+      id: 7,
+      title: 'Studio Apartment in Kiyovu',
+      location: 'Kiyovu, Kigali',
+      price: 200,
+      features: ['Furnished', 'Balcony'],
+      image: '🏠',
+    },
+    {
+      id: 8,
+      title: 'Shared Room in Kabeza',
+      location: 'Kabeza, Kigali',
+      price: 75,
+      features: ['WiFi', 'Kitchen'],
+      image: '🏘️',
+    },
+    {
+      id: 9,
+      title: 'Luxury Apartment in Kigali Heights',
+      location: 'Kigali Heights, Rwanda',
+      price: 380,
+      features: ['Furnished', 'Pool', 'Security'],
+      image: '🏢',
+    },
+    {
+      id: 10,
+      title: 'Budget Room in Nyamirambo',
+      location: 'Nyamirambo, Kigali',
+      price: 60,
+      features: ['WiFi', 'Shared Kitchen'],
+      image: '🏠',
+    },
+    {
+      id: 11,
+      title: 'Premium Studio in Kigali Business District',
+      location: 'Kigali Business District',
+      price: 320,
+      features: ['Furnished', 'Gym', 'Parking'],
+      image: '🏢',
+    },
+    {
+      id: 12,
+      title: 'Cozy Room in Gikondo',
+      location: 'Gikondo, Kigali',
+      price: 85,
+      features: ['WiFi', 'Garden View'],
       image: '🏡',
     },
   ];
 
   const filteredListings = listings.filter(listing => {
-    if (filters.minPrice && listing.price < parseInt(filters.minPrice)) return false;
-    if (filters.maxPrice && listing.price > parseInt(filters.maxPrice)) return false;
+    // Location filter
+    if (filters.location && !listing.location.toLowerCase().includes(filters.location.toLowerCase())) {
+      return false;
+    }
+    
+    // Price filters
+    if (filters.minPrice && listing.price < parseInt(filters.minPrice)) {
+      return false;
+    }
+    if (filters.maxPrice && listing.price > parseInt(filters.maxPrice)) {
+      return false;
+    }
+    
+    // Feature filters
+    if (filters.furnished && !listing.features.some(f => f.toLowerCase().includes('furnished'))) {
+      return false;
+    }
+    if (filters.privateBathroom && !listing.features.some(f => f.toLowerCase().includes('private') || f.toLowerCase().includes('bath'))) {
+      return false;
+    }
+    if (filters.parking && !listing.features.some(f => f.toLowerCase().includes('parking'))) {
+      return false;
+    }
+    if (filters.petFriendly && !listing.features.some(f => f.toLowerCase().includes('pet'))) {
+      return false;
+    }
+    if (filters.gym && !listing.features.some(f => f.toLowerCase().includes('gym'))) {
+      return false;
+    }
+    if (filters.wifi && !listing.features.some(f => f.toLowerCase().includes('wifi'))) {
+      return false;
+    }
+    
     return true;
   });
 

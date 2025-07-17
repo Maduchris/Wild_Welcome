@@ -19,6 +19,22 @@ const getVariantStyles = (variant, theme) => {
           color: ${theme.colors.gray[500]};
           cursor: not-allowed;
         }
+        
+        /* Dark theme neon effect */
+        ${theme.colors.background === '#000000' && css`
+          box-shadow: 0 0 10px ${theme.colors.primary}, 0 0 20px ${theme.colors.primary}, 0 0 30px ${theme.colors.primary};
+          animation: neonPulse 2s infinite;
+          
+          &:hover {
+            box-shadow: 0 0 15px ${theme.colors.primary}, 0 0 25px ${theme.colors.primary}, 0 0 35px ${theme.colors.primary};
+            animation: neonPulse 1s infinite;
+          }
+          
+          @keyframes neonPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+          }
+        `}
       `;
     
     case 'secondary':
@@ -37,6 +53,17 @@ const getVariantStyles = (variant, theme) => {
           color: ${theme.colors.gray[500]};
           cursor: not-allowed;
         }
+        
+        /* Dark theme neon effect */
+        ${theme.colors.background === '#000000' && css`
+          box-shadow: 0 0 8px ${theme.colors.primary}, 0 0 16px ${theme.colors.primary};
+          animation: neonPulse 2.5s infinite;
+          
+          &:hover {
+            box-shadow: 0 0 12px ${theme.colors.primary}, 0 0 20px ${theme.colors.primary};
+            animation: neonPulse 1.5s infinite;
+          }
+        `}
       `;
     
     case 'outline':
@@ -56,6 +83,17 @@ const getVariantStyles = (variant, theme) => {
           color: ${theme.colors.gray[500]};
           cursor: not-allowed;
         }
+        
+        /* Dark theme neon effect */
+        ${theme.colors.background === '#000000' && css`
+          box-shadow: 0 0 5px ${theme.colors.border}, 0 0 10px ${theme.colors.border};
+          animation: neonPulse 3s infinite;
+          
+          &:hover {
+            box-shadow: 0 0 8px ${theme.colors.border}, 0 0 15px ${theme.colors.border};
+            animation: neonPulse 2s infinite;
+          }
+        `}
       `;
     
     case 'ghost':
@@ -72,6 +110,14 @@ const getVariantStyles = (variant, theme) => {
           color: ${theme.colors.gray[500]};
           cursor: not-allowed;
         }
+        
+        /* Dark theme neon effect */
+        ${theme.colors.background === '#000000' && css`
+          &:hover {
+            box-shadow: 0 0 5px ${theme.colors.text}, 0 0 10px ${theme.colors.text};
+            animation: neonPulse 2s infinite;
+          }
+        `}
       `;
     
     case 'danger':
@@ -91,6 +137,17 @@ const getVariantStyles = (variant, theme) => {
           color: ${theme.colors.gray[500]};
           cursor: not-allowed;
         }
+        
+        /* Dark theme neon effect */
+        ${theme.colors.background === '#000000' && css`
+          box-shadow: 0 0 10px ${theme.colors.error}, 0 0 20px ${theme.colors.error};
+          animation: neonPulse 2s infinite;
+          
+          &:hover {
+            box-shadow: 0 0 15px ${theme.colors.error}, 0 0 25px ${theme.colors.error};
+            animation: neonPulse 1s infinite;
+          }
+        `}
       `;
     
     default:
@@ -103,6 +160,17 @@ const getVariantStyles = (variant, theme) => {
           background-color: ${theme.colors.primaryDark};
           border-color: ${theme.colors.primaryDark};
         }
+        
+        /* Dark theme neon effect */
+        ${theme.colors.background === '#000000' && css`
+          box-shadow: 0 0 10px ${theme.colors.primary}, 0 0 20px ${theme.colors.primary};
+          animation: neonPulse 2s infinite;
+          
+          &:hover {
+            box-shadow: 0 0 15px ${theme.colors.primary}, 0 0 25px ${theme.colors.primary};
+            animation: neonPulse 1s infinite;
+          }
+        `}
       `;
   }
 };
@@ -143,6 +211,8 @@ const StyledButton = styled.button`
   text-decoration: none;
   white-space: nowrap;
   min-height: 44px;
+  position: relative;
+  overflow: hidden;
   
   ${props => getVariantStyles(props.variant, props.theme)}
   ${props => getSizeStyles(props.size, props.theme)}
@@ -169,6 +239,28 @@ const StyledButton = styled.button`
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+  `}
+  
+  /* Dark theme additional effects */
+  ${props => props.theme.colors.background === '#000000' && css`
+    &:active {
+      transform: scale(0.98);
+    }
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    &:hover::before {
+      left: 100%;
     }
   `}
 `;

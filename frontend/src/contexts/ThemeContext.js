@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { lightTheme, darkTheme } from '../styles/theme';
 
 const ThemeContext = createContext();
@@ -11,7 +12,14 @@ export const useTheme = () => {
   return context;
 };
 
+// Helper function to check if current route is a general page
+const isGeneralPage = (pathname) => {
+  const generalRoutes = ['/', '/login', '/signup', '/confirmation'];
+  return generalRoutes.includes(pathname);
+};
+
 export const ThemeProvider = ({ children }) => {
+  const location = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check localStorage for saved theme preference
     const savedTheme = localStorage.getItem('theme');
@@ -22,7 +30,10 @@ export const ThemeProvider = ({ children }) => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  // Use dark theme for non-general pages by default, but allow user to override
+  const isGeneral = isGeneralPage(location.pathname);
+  const effectiveDarkMode = isDarkMode;
+  const theme = effectiveDarkMode ? darkTheme : lightTheme;
 
   const toggleTheme = () => {
     console.log('Toggling theme from:', isDarkMode ? 'dark' : 'light', 'to:', !isDarkMode ? 'dark' : 'light');
@@ -39,11 +50,11 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
     
     // Update document body class for global CSS
-    document.body.classList.toggle('dark-mode', isDarkMode);
-    document.body.classList.toggle('light-mode', !isDarkMode);
+    document.body.classList.toggle('dark-mode', effectiveDarkMode);
+    document.body.classList.toggle('light-mode', !effectiveDarkMode);
     
-    console.log('Theme changed to:', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
+    console.log('Theme changed to:', effectiveDarkMode ? 'dark' : 'light', 'isGeneral:', isGeneral);
+  }, [isDarkMode, effectiveDarkMode, isGeneral]);
 
   // Listen for system theme changes
   useEffect(() => {
@@ -61,9 +72,10 @@ export const ThemeProvider = ({ children }) => {
 
   const value = {
     theme,
-    isDarkMode,
+    isDarkMode: effectiveDarkMode,
     toggleTheme,
     setTheme,
+    isGeneralPage: isGeneral,
   };
 
   return (

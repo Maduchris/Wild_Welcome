@@ -250,7 +250,14 @@ const BookingProcess2 = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [bookingData, setBookingData] = useState(null);
-  const [property, setProperty] = useState(null);
+  const [property] = useState({
+    id: 1,
+    title: 'Cozy Studio in Kigali City Center',
+    location: 'Kigali, Rwanda',
+    price: 120,
+    features: ['Furnished', 'Private Bathroom', 'WiFi', 'Kitchen'],
+    image: '🏠'
+  });
 
   useEffect(() => {
     // Simulate loading booking data from previous step
@@ -268,13 +275,13 @@ const BookingProcess2 = () => {
     });
 
     // Simulate loading property data
-    setProperty({
-      id: listingId,
-      title: 'Cozy Studio in Downtown',
-      location: 'Downtown, New York',
-      price: 1200,
-      image: '🏠',
-    });
+    // setProperty({
+    //   id: listingId,
+    //   title: 'Cozy Studio in Downtown',
+    //   location: 'Downtown, New York',
+    //   price: 1200,
+    //   image: '🏠',
+    // });
   }, [listingId]);
 
   const handleSubmit = async () => {

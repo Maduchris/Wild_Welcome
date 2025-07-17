@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import './Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get redirect path from location state (if user was redirected from protected route)
+  const from = location.state?.from?.pathname || '/user';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,15 +60,21 @@ const Login = () => {
     }
     
     setIsLoading(true);
+    setErrors({});
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await login(formData);
       
-      // Navigate to user landing page on success
-      navigate('/user');
+      if (result.success) {
+        // Login successful - navigation is handled by the auth context
+        console.log('Login successful:', result.user);
+      } else {
+        // Login failed
+        setErrors({ general: result.error });
+      }
     } catch (error) {
       console.error('Login error:', error);
+      setErrors({ general: 'An unexpected error occurred. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -77,6 +90,12 @@ const Login = () => {
           </div>
 
           <form className="login-form" onSubmit={handleSubmit}>
+            {errors.general && (
+              <div className="error-message general-error">
+                {errors.general}
+              </div>
+            )}
+            
             <div className="form-group">
               <label htmlFor="email" className="form-label">Email Address</label>
               <input
@@ -87,6 +106,7 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
+                disabled={isLoading}
               />
               {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
@@ -101,6 +121,7 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
+                disabled={isLoading}
               />
               {errors.password && <span className="error-message">{errors.password}</span>}
             </div>
@@ -117,8 +138,6 @@ const Login = () => {
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
-
-          <div className="divider">or continue with</div>
 
           <div className="social-login">
             <a href="#" className="social-button">
