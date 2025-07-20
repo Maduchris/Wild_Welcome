@@ -1,7 +1,7 @@
 /* BookingProcess1.css */
 .booking-process-1 {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #EEC170 0%, #AFBE8E 100%);
   padding: 20px;
   font-family: 'Inter', sans-serif;
 }
@@ -16,7 +16,7 @@
 }
 
 .booking-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #295135 0%, #86571F 100%);
   color: white;
   padding: 30px;
   text-align: center;
@@ -70,7 +70,7 @@
 }
 
 .section-icon {
-  color: #667eea;
+  color: #295135;
   font-size: 1.3rem;
 }
 
@@ -83,7 +83,7 @@
 
 .room-card {
   background: white;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #AFBE8E;
   border-radius: 15px;
   overflow: hidden;
   cursor: pointer;
@@ -97,14 +97,14 @@
 }
 
 .room-card.selected {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #295135;
+  box-shadow: 0 0 0 3px rgba(41, 81, 53, 0.1);
 }
 
 .room-image {
   width: 100%;
   height: 200px;
-  background: linear-gradient(45deg, #667eea, #764ba2);
+  background: linear-gradient(45deg, #EEC170, #AFBE8E);
   position: relative;
   overflow: hidden;
 }
@@ -119,7 +119,7 @@
   position: absolute;
   top: 15px;
   right: 15px;
-  background: #667eea;
+  background: #295135;
   color: white;
   padding: 5px 12px;
   border-radius: 20px;
@@ -150,7 +150,7 @@
 .room-price {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #667eea;
+  color: #295135;
   margin-bottom: 15px;
 }
 
@@ -162,12 +162,13 @@
 }
 
 .feature-tag {
-  background: #f8f9fa;
-  color: #666;
+  background: #F9F7F3;
+  color: #295135;
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 500;
+  border: 1px solid #AFBE8E;
 }
 
 .room-description {
@@ -183,7 +184,7 @@
   left: 15px;
   width: 24px;
   height: 24px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #AFBE8E;
   border-radius: 50%;
   background: white;
   display: flex;
@@ -193,8 +194,8 @@
 }
 
 .room-card.selected .selection-indicator {
-  background: #667eea;
-  border-color: #667eea;
+  background: #295135;
+  border-color: #295135;
 }
 
 .room-card.selected .selection-indicator::after {
@@ -205,7 +206,7 @@
 }
 
 .booking-summary {
-  background: #f8f9fa;
+  background: #F9F7F3;
   border-radius: 15px;
   padding: 25px;
   margin-bottom: 30px;
@@ -223,7 +224,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #AFBE8E;
 }
 
 .summary-item:last-child {
@@ -243,7 +244,7 @@
 .summary-total {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #667eea;
+  color: #295135;
 }
 
 .date-selection {
@@ -270,7 +271,7 @@
 
 .date-input {
   padding: 12px 15px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #AFBE8E;
   border-radius: 10px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
@@ -279,7 +280,7 @@
 
 .date-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #295135;
 }
 
 .duration-selection {
@@ -296,7 +297,7 @@
   flex: 1;
   min-width: 120px;
   padding: 15px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #AFBE8E;
   border-radius: 10px;
   text-align: center;
   cursor: pointer;
@@ -305,13 +306,13 @@
 }
 
 .duration-option:hover {
-  border-color: #667eea;
+  border-color: #295135;
   transform: translateY(-2px);
 }
 
 .duration-option.selected {
-  border-color: #667eea;
-  background: #667eea;
+  border-color: #295135;
+  background: #295135;
   color: white;
 }
 
@@ -334,9 +335,9 @@
 }
 
 .btn-back {
-  background: #f8f9fa;
-  color: #666;
-  border: 2px solid #e0e0e0;
+  background: #F9F7F3;
+  color: #295135;
+  border: 2px solid #AFBE8E;
   padding: 15px 30px;
   border-radius: 10px;
   font-weight: 600;
@@ -348,12 +349,12 @@
 }
 
 .btn-back:hover {
-  background: #e9ecef;
-  border-color: #adb5bd;
+  background: #EEC170;
+  border-color: #86571F;
 }
 
 .btn-next {
-  background: #667eea;
+  background: #295135;
   color: white;
   border: none;
   padding: 15px 30px;
@@ -365,7 +366,7 @@
 }
 
 .btn-next:hover {
-  background: #5a6fd8;
+  background: #86571F;
   transform: translateY(-2px);
 }
 

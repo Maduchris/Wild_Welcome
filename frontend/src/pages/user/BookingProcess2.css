@@ -1,7 +1,7 @@
 /* BookingProcess2.css */
 .booking-process-2 {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #EEC170 0%, #AFBE8E 100%);
   padding: 20px;
   font-family: 'Inter', sans-serif;
 }
@@ -16,7 +16,7 @@
 }
 
 .booking-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #295135 0%, #86571F 100%);
   color: white;
   padding: 30px;
   text-align: center;
@@ -56,7 +56,7 @@
 }
 
 .booking-summary {
-  background: #f8f9fa;
+  background: #F9F7F3;
   border-radius: 15px;
   padding: 25px;
   margin-bottom: 30px;
@@ -73,7 +73,7 @@
 }
 
 .summary-icon {
-  color: #667eea;
+  color: #295135;
   font-size: 1.2rem;
 }
 
@@ -88,7 +88,7 @@
   background: white;
   padding: 15px;
   border-radius: 10px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #AFBE8E;
 }
 
 .summary-label {
@@ -104,7 +104,7 @@
 }
 
 .summary-total {
-  background: #667eea;
+  background: #295135;
   color: white;
   padding: 20px;
   border-radius: 10px;
@@ -138,7 +138,7 @@
 }
 
 .section-icon {
-  color: #667eea;
+  color: #295135;
   font-size: 1.3rem;
 }
 
@@ -150,7 +150,7 @@
 }
 
 .payment-method {
-  border: 2px solid #e0e0e0;
+  border: 2px solid #AFBE8E;
   border-radius: 10px;
   padding: 20px;
   cursor: pointer;
@@ -160,19 +160,19 @@
 }
 
 .payment-method:hover {
-  border-color: #667eea;
+  border-color: #295135;
   transform: translateY(-2px);
 }
 
 .payment-method.selected {
-  border-color: #667eea;
-  background: #f8f9ff;
+  border-color: #295135;
+  background: #F9F7F3;
 }
 
 .payment-icon {
   font-size: 2rem;
   margin-bottom: 10px;
-  color: #667eea;
+  color: #295135;
 }
 
 .payment-name {
@@ -188,7 +188,7 @@
 
 .payment-form {
   background: white;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #AFBE8E;
   border-radius: 15px;
   padding: 25px;
 }
@@ -218,7 +218,7 @@
 
 .form-input {
   padding: 12px 15px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #AFBE8E;
   border-radius: 10px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
@@ -227,7 +227,7 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #295135;
 }
 
 .form-input.error {
@@ -241,7 +241,7 @@
 }
 
 .card-preview {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #295135 0%, #86571F 100%);
   color: white;
   padding: 20px;
   border-radius: 10px;
@@ -304,7 +304,7 @@
 }
 
 .toggle-switch.active {
-  background: #667eea;
+  background: #295135;
 }
 
 .toggle-switch::after {
@@ -329,7 +329,7 @@
 }
 
 .terms-section {
-  background: #f8f9fa;
+  background: #F9F7F3;
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 30px;
@@ -344,7 +344,7 @@
 
 .terms-checkbox input {
   margin-top: 3px;
-  accent-color: #667eea;
+  accent-color: #295135;
 }
 
 .terms-text {
@@ -354,7 +354,7 @@
 }
 
 .terms-link {
-  color: #667eea;
+  color: #295135;
   text-decoration: none;
   font-weight: 600;
 }
@@ -371,9 +371,9 @@
 }
 
 .btn-back {
-  background: #f8f9fa;
-  color: #666;
-  border: 2px solid #e0e0e0;
+  background: #F9F7F3;
+  color: #295135;
+  border: 2px solid #AFBE8E;
   padding: 15px 30px;
   border-radius: 10px;
   font-weight: 600;
@@ -385,12 +385,12 @@
 }
 
 .btn-back:hover {
-  background: #e9ecef;
-  border-color: #adb5bd;
+  background: #EEC170;
+  border-color: #86571F;
 }
 
 .btn-confirm {
-  background: #667eea;
+  background: #295135;
   color: white;
   border: none;
   padding: 15px 30px;
@@ -405,7 +405,7 @@
 }
 
 .btn-confirm:hover {
-  background: #5a6fd8;
+  background: #86571F;
   transform: translateY(-2px);
 }
 
@@ -453,7 +453,7 @@
 
 .success-icon {
   font-size: 4rem;
-  color: #48bb78;
+  color: #AFBE8E;
   margin-bottom: 20px;
 }
 
@@ -471,7 +471,7 @@
 }
 
 .btn-view-booking {
-  background: #667eea;
+  background: #295135;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -484,7 +484,7 @@
 }
 
 .btn-view-booking:hover {
-  background: #5a6fd8;
+  background: #86571F;
 }
 
 @media (max-width: 768px) {
