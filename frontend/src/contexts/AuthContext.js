@@ -88,12 +88,39 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(true);
           }
         } else {
+          // TEMPORARY: Set default user for testing (remove this later)
+          console.log('No stored auth found, setting default user for testing');
+          const defaultUser = {
+            email: 'test@example.com',
+            first_name: 'Test',
+            last_name: 'User',
+            user_type: 'user', // Change to 'landlord' to test landlord routes
+            is_active: true,
+            is_verified: true
+          };
+          setUser(defaultUser);
+          setStoredUser(defaultUser);
+          setIsAuthenticated(true);
           // Clear any invalid stored data
-          clearStoredAuth();
+          // clearStoredAuth();
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        clearStoredAuth();
+        // TEMPORARY: Don't clear auth on error for testing
+        // clearStoredAuth();
+        
+        // Set default user even on error for testing
+        const defaultUser = {
+          email: 'test@example.com',
+          first_name: 'Test',
+          last_name: 'User',
+          user_type: 'user', // Change to 'landlord' to test landlord routes
+          is_active: true,
+          is_verified: true
+        };
+        setUser(defaultUser);
+        setStoredUser(defaultUser);
+        setIsAuthenticated(true);
       } finally {
         setIsLoading(false);
       }
