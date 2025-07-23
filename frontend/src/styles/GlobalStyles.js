@@ -43,12 +43,12 @@ const GlobalStyles = createGlobalStyle`
   }
 
   a {
-    color: ${props => props.theme.colors.primary};
+    color: ${props => props.theme.colors.textSecondary};
     text-decoration: none;
     transition: color 0.2s ease;
 
     &:hover {
-      color: ${props => props.theme.colors.primaryDark};
+      color: ${props => props.theme.colors.primary};
     }
   }
 
@@ -67,7 +67,7 @@ const GlobalStyles = createGlobalStyle`
     border-radius: 0.5rem;
     padding: 0.75rem;
     font-size: 1rem;
-    background: ${props => props.theme.colors.inputBackground};
+    background-color: ${props => props.theme.colors.surface};
     color: ${props => props.theme.colors.text};
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 

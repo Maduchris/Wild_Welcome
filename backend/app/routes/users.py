@@ -125,6 +125,14 @@ async def get_user_favourites(
         {"_id": {"$in": [ObjectId(pid) for pid in favourite_ids]}}
     ).to_list(None)
     
+    # Convert ObjectId to string for JSON serialization
+    for prop in properties:
+        if prop.get("_id"):
+            prop["id"] = str(prop["_id"])
+            del prop["_id"]
+        if prop.get("landlord_id"):
+            prop["landlord_id"] = str(prop["landlord_id"])
+    
     return {"favourites": properties}
 
 

@@ -1,34 +1,35 @@
-import styled, { css } from 'styled-components';
+import React from "react";
+import styled, { css } from "styled-components";
 
 const getInputStyles = (variant, theme) => {
   switch (variant) {
-    case 'error':
+    case "error":
       return css`
         border-color: ${theme.colors.error};
-        
+
         &:focus {
           border-color: ${theme.colors.error};
           box-shadow: 0 0 0 3px ${theme.colors.errorLight};
         }
       `;
-    
-    case 'success':
+
+    case "success":
       return css`
         border-color: ${theme.colors.success};
-        
+
         &:focus {
           border-color: ${theme.colors.success};
-          box-shadow: 0 0 0 3px ${theme.colors.successLight};
+          box-shadow: 0 0 0 3px ${theme.colors.success}20;
         }
       `;
-    
+
     default:
       return css`
         border-color: ${theme.colors.border};
-        
+
         &:focus {
           border-color: ${theme.colors.primary};
-          box-shadow: 0 0 0 3px ${theme.colors.primaryLight};
+          box-shadow: 0 0 0 3px ${theme.colors.primary}20;
         }
       `;
   }
@@ -36,25 +37,26 @@ const getInputStyles = (variant, theme) => {
 
 const StyledInput = styled.input`
   width: 100%;
-  padding: ${props => props.theme.spacing.md};
-  font-size: ${props => props.theme.typography.fontSizes.base};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius.md};
-  background-color: ${props => props.theme.colors.white};
-  color: ${props => props.theme.colors.text};
-  transition: all ${props => props.theme.transitions.normal};
-  
+  padding: ${(props) => props.theme.spacing.md};
+  font-size: ${(props) => props.theme.typography.fontSizes.base};
+  border: 1px solid ${(props) => props.theme.colors.border};
+  border-radius: ${(props) => props.theme.borderRadius.md};
+  background-color: ${(props) => props.theme.colors.surface};
+  color: ${(props) => props.theme.colors.text};
+  transition: all ${(props) => props.theme.transitions.normal};
+
   &::placeholder {
-    color: ${props => props.theme.colors.textLight};
+    color: ${(props) => props.theme.colors.textSecondary};
   }
-  
+
   &:disabled {
-    background-color: ${props => props.theme.colors.gray[100]};
-    color: ${props => props.theme.colors.gray[500]};
+    background-color: ${(props) =>
+      props.theme.colors.surfaceAlt || props.theme.colors.surface};
+    color: ${(props) => props.theme.colors.textSecondary};
     cursor: not-allowed;
   }
-  
-  ${props => getInputStyles(props.variant, props.theme)}
+
+  ${(props) => getInputStyles(props.variant, props.theme)}
 `;
 
 const InputWrapper = styled.div`
@@ -64,43 +66,39 @@ const InputWrapper = styled.div`
 
 const InputLabel = styled.label`
   display: block;
-  margin-bottom: ${props => props.theme.spacing.sm};
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  font-weight: ${props => props.theme.typography.fontWeights.medium};
-  color: ${props => props.theme.colors.text};
+  margin-bottom: ${(props) => props.theme.spacing.sm};
+  font-size: ${(props) => props.theme.typography.fontSizes.sm};
+  font-weight: ${(props) => props.theme.typography.fontWeights.medium};
+  color: ${(props) => props.theme.colors.text};
 `;
 
 const InputError = styled.span`
   display: block;
-  margin-top: ${props => props.theme.spacing.sm};
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  color: ${props => props.theme.colors.error};
+  margin-top: ${(props) => props.theme.spacing.sm};
+  font-size: ${(props) => props.theme.typography.fontSizes.sm};
+  color: ${(props) => props.theme.colors.error};
 `;
 
 const InputHelp = styled.span`
   display: block;
-  margin-top: ${props => props.theme.spacing.sm};
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  color: ${props => props.theme.colors.textSecondary};
+  margin-top: ${(props) => props.theme.spacing.sm};
+  font-size: ${(props) => props.theme.typography.fontSizes.sm};
+  color: ${(props) => props.theme.colors.textSecondary};
 `;
 
-const Input = ({
-  label,
-  error,
-  help,
-  variant,
-  ...props
-}) => {
-  const inputVariant = error ? 'error' : variant;
-  
-  return (
-    <InputWrapper>
-      {label && <InputLabel>{label}</InputLabel>}
-      <StyledInput variant={inputVariant} {...props} />
-      {error && <InputError>{error}</InputError>}
-      {help && !error && <InputHelp>{help}</InputHelp>}
-    </InputWrapper>
-  );
-};
+const Input = React.forwardRef(
+  ({ label, error, help, variant, ...props }, ref) => {
+    const inputVariant = error ? "error" : variant;
 
-export default Input; 
+    return (
+      <InputWrapper>
+        {label && <InputLabel>{label}</InputLabel>}
+        <StyledInput ref={ref} variant={inputVariant} {...props} />
+        {error && <InputError>{error}</InputError>}
+        {help && !error && <InputHelp>{help}</InputHelp>}
+      </InputWrapper>
+    );
+  }
+);
+
+export default Input;

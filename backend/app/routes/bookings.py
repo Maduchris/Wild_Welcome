@@ -281,6 +281,7 @@ async def get_landlord_booking_requests(
 @router.post("/{booking_id}/approve")
 async def approve_booking(
     booking_id: str,
+    message_data: dict = None,
     current_user: User = Depends(get_current_landlord),
     db = Depends(get_database)
 ):
@@ -313,10 +314,22 @@ async def approve_booking(
             detail="Only pending bookings can be approved"
         )
     
+    # Get response message if provided
+    response_message = ""
+    if message_data and message_data.get("response_message"):
+        response_message = message_data.get("response_message")
+    
     # Approve booking
+    update_data = {
+        "status": "confirmed", 
+        "updated_at": datetime.utcnow()
+    }
+    if response_message:
+        update_data["landlord_response"] = response_message
+    
     await db.bookings.update_one(
         {"_id": ObjectId(booking_id)},
-        {"$set": {"status": "confirmed", "updated_at": datetime.utcnow()}}
+        {"$set": update_data}
     )
     
     return {"message": "Booking approved successfully"}
@@ -325,6 +338,7 @@ async def approve_booking(
 @router.post("/{booking_id}/reject")
 async def reject_booking(
     booking_id: str,
+    message_data: dict = None,
     current_user: User = Depends(get_current_landlord),
     db = Depends(get_database)
 ):
@@ -357,10 +371,22 @@ async def reject_booking(
             detail="Only pending bookings can be rejected"
         )
     
+    # Get response message if provided
+    response_message = ""
+    if message_data and message_data.get("response_message"):
+        response_message = message_data.get("response_message")
+    
     # Reject booking
+    update_data = {
+        "status": "cancelled", 
+        "updated_at": datetime.utcnow()
+    }
+    if response_message:
+        update_data["landlord_response"] = response_message
+    
     await db.bookings.update_one(
         {"_id": ObjectId(booking_id)},
-        {"$set": {"status": "cancelled", "updated_at": datetime.utcnow()}}
+        {"$set": update_data}
     )
     
     return {"message": "Booking rejected successfully"}

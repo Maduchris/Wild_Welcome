@@ -1,462 +1,269 @@
 /* Reject Page Styles */
 .reject-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #295135 0%, #AFBE8E 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 2rem;
 }
 
 .reject-card {
-  background: #F9F7F3;
+  background: #ffffff;
   border-radius: 1rem;
-  padding: 3rem 2rem;
-  max-width: 600px;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+  padding: 3rem;
   width: 100%;
-  text-align: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid #AFBE8E;
-  animation: cardSlideIn 0.3s ease-out;
+  max-width: 500px;
+  animation: slideUp 0.5s ease-out;
 }
 
-@keyframes cardSlideIn {
+@keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(-20px) scale(0.95);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
+}
+
+.reject-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
 .reject-icon {
   width: 80px;
   height: 80px;
+  background: #fee2e2;
   border-radius: 50%;
-  background: #86571F;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #F9F7F3;
-  font-size: 2.5rem;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1.5rem;
+  font-size: 2rem;
+  color: #dc2626;
 }
 
 .reject-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: #295135;
-  margin-bottom: 1rem;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
 }
 
 .reject-subtitle {
-  font-size: 1.125rem;
-  color: #86571F;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.booking-details {
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
   margin-bottom: 2rem;
-  line-height: 1.6;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.detail-value {
+  color: #64748b;
+  font-size: 0.875rem;
 }
 
 .applicant-info {
-  background: #F9F7F3;
-  border: 1px solid #AFBE8E;
+  background: #f1f5f9;
   border-radius: 0.5rem;
-  padding: 1.5rem;
+  padding: 1rem;
   margin-bottom: 2rem;
-  text-align: left;
 }
 
-.info-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #295135;
-  margin-bottom: 1rem;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.info-item {
+.applicant-header {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.info-label {
-  font-size: 0.875rem;
-  color: #86571F;
-  font-weight: 500;
-  text-transform: uppercase;
-}
-
-.info-value {
-  color: #295135;
-  font-weight: 600;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .applicant-avatar {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: #AFBE8E;
+  background: #3b82f6;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #295135;
-  font-size: 1.5rem;
+  color: #ffffff;
   font-weight: 600;
-  margin: 0 auto 1rem;
-}
-
-.applicant-name {
   font-size: 1.25rem;
+}
+
+.applicant-details h4 {
   font-weight: 600;
-  color: #295135;
-  margin-bottom: 0.5rem;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
 }
 
-.applicant-email {
-  color: #86571F;
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
-
-.applicant-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.stat-item {
-  text-align: center;
-}
-
-.stat-number {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #EEC170;
-}
-
-.stat-label {
-  font-size: 0.75rem;
-  color: #86571F;
-  text-transform: uppercase;
-}
-
-.property-details {
-  background: #F9F7F3;
-  border: 1px solid #AFBE8E;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  text-align: left;
-}
-
-.property-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #295135;
-  margin-bottom: 0.5rem;
-}
-
-.property-address {
-  color: #86571F;
+.applicant-details p {
+  color: #64748b;
   font-size: 0.875rem;
-  margin-bottom: 1rem;
-}
-
-.property-image {
-  width: 100%;
-  height: 200px;
-  background: linear-gradient(45deg, #295135, #AFBE8E);
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #F9F7F3;
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-.property-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #EEC170;
-  margin-bottom: 0.5rem;
-}
-
-.property-amenities {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.amenity-tag {
-  background: #AFBE8E;
-  color: #295135;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
-  font-weight: 500;
 }
 
 .reject-form {
-  background: #F9F7F3;
-  border: 1px solid #EEC170;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  text-align: left;
-}
-
-.form-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #295135;
-  margin-bottom: 0.5rem;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.form-icon {
-  color: #EEC170;
-  font-size: 1.25rem;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1rem;
 }
 
 .form-label {
   font-weight: 500;
-  color: #295135;
+  color: #374151;
   font-size: 0.875rem;
 }
 
 .form-select {
   padding: 0.75rem 1rem;
-  border: 2px solid #AFBE8E;
+  border: 2px solid #e5e7eb;
   border-radius: 0.5rem;
-  background: #F9F7F3;
-  color: #295135;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  background: #ffffff;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .form-select:focus {
   outline: none;
-  border-color: #295135;
-  box-shadow: 0 0 0 3px #AFBE8E;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
 }
 
 .form-textarea {
   padding: 0.75rem 1rem;
-  border: 2px solid #AFBE8E;
+  border: 2px solid #e5e7eb;
   border-radius: 0.5rem;
-  background: #F9F7F3;
-  color: #295135;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  font-family: inherit;
   resize: vertical;
   min-height: 100px;
+  transition: all 0.2s ease;
+  background: #ffffff;
 }
 
 .form-textarea:focus {
   outline: none;
-  border-color: #295135;
-  box-shadow: 0 0 0 3px #AFBE8E;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
 }
 
 .form-textarea::placeholder {
-  color: #86571F;
-}
-
-.form-select.error,
-.form-textarea.error {
-  border-color: #86571F;
-}
-
-.error-message {
-  color: #86571F;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
+  color: #9ca3af;
 }
 
 .reject-actions {
   display: flex;
   gap: 1rem;
-  justify-content: center;
+  margin-top: 2rem;
 }
 
 .cancel-button {
-  background: #F9F7F3;
-  color: #295135;
-  padding: 0.875rem 2rem;
-  border: 2px solid #AFBE8E;
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border: 2px solid #e5e7eb;
   border-radius: 0.5rem;
+  background: #ffffff;
+  color: #374151;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cancel-button:hover {
-  background: #AFBE8E;
-  color: #295135;
+  border-color: #d1d5db;
+  background: #f9fafb;
 }
 
 .reject-button {
-  background: #86571F;
-  color: #F9F7F3;
-  padding: 0.875rem 2rem;
+  flex: 1;
+  background: #dc2626;
+  color: #ffffff;
+  padding: 0.875rem 1.5rem;
   border: none;
   border-radius: 0.5rem;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .reject-button:hover {
-  background: #EEC170;
-  color: #86571F;
+  background: #b91c1c;
   transform: translateY(-1px);
 }
 
 .reject-button:disabled {
-  background: #AFBE8E;
-  color: #295135;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
-.loading-spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid #AFBE8E;
-  border-top: 2px solid #EEC170;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-right: 0.5rem;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.success-state {
-  text-align: center;
-  padding: 2rem;
-}
-
-.success-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: #AFBE8E;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #295135;
-  font-size: 2.5rem;
-  margin: 0 auto 1.5rem;
-}
-
-.success-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #295135;
-  margin-bottom: 0.5rem;
-}
-
-.success-message {
-  color: #86571F;
-  font-size: 1rem;
-  margin-bottom: 2rem;
-}
-
-.continue-button {
-  background: #295135;
-  color: #F9F7F3;
-  padding: 0.875rem 2rem;
-  border: none;
+.warning-text {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
   border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
 }
 
-.continue-button:hover {
-  background: #AFBE8E;
-  color: #295135;
-  transform: translateY(-1px);
+.warning-title {
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.warning-message {
+  color: #a16207;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-  .reject-container {
-    padding: 1rem;
-  }
-  
+@media (max-width: 480px) {
   .reject-card {
-    padding: 2rem 1.5rem;
-  }
-  
-  .reject-title {
-    font-size: 1.75rem;
-  }
-  
-  .reject-subtitle {
-    font-size: 1rem;
-  }
-  
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .applicant-stats {
-    grid-template-columns: repeat(2, 1fr);
+    padding: 2rem;
   }
   
   .reject-actions {
     flex-direction: column;
-  }
-  
-  .cancel-button,
-  .reject-button {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .reject-card {
-    padding: 1.5rem 1rem;
-  }
-  
-  .reject-title {
-    font-size: 1.5rem;
-  }
-  
-  .applicant-stats {
-    grid-template-columns: 1fr;
-  }
-  
-  .property-image {
-    height: 150px;
   }
 } 

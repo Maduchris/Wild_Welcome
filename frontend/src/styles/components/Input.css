@@ -1,72 +1,76 @@
 /* Input Component Styles */
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.input-wrapper {
+  position: relative;
+  width: 100%;
 }
 
 .input-label {
+  display: block;
+  margin-bottom: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #295135;
+  color: #1e293b;
 }
 
 .input-field {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #AFBE8E;
-  border-radius: 0.5rem;
-  background-color: #F9F7F3;
-  color: #295135;
+  padding: 1rem;
   font-size: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #1e293b;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .input-field::placeholder {
-  color: #86571F;
+  color: #94a3b8;
 }
 
 .input-field:disabled {
-  background-color: #F9F7F3;
-  color: #86571F;
+  background-color: #f1f5f9;
+  color: #64748b;
   cursor: not-allowed;
 }
 
-.input-field:focus {
+/* Input Variants */
+.input-field--default:focus {
   outline: none;
-  border-color: #295135;
-  box-shadow: 0 0 0 3px #AFBE8E;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px #dbeafe;
 }
 
-.input-field.error {
-  border-color: #86571F;
+.input-field--error {
+  border-color: #ef4444;
 }
 
-.input-field.error:focus {
-  border-color: #86571F;
-  box-shadow: 0 0 0 3px #EEC170;
+.input-field--error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px #fee2e2;
 }
 
-.input-field.success {
-  border-color: #AFBE8E;
+.input-field--success {
+  border-color: #10b981;
 }
 
-.input-field.success:focus {
-  border-color: #AFBE8E;
-  box-shadow: 0 0 0 3px #AFBE8E;
+.input-field--success:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px #d1fae5;
 }
 
 .input-error {
-  font-size: 0.75rem;
-  color: #86571F;
-  margin-top: 0.25rem;
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #ef4444;
 }
 
 .input-help {
-  font-size: 0.75rem;
-  color: #86571F;
-  margin-top: 0.25rem;
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
 }
 
 /* Input Types */

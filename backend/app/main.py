@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.database.mongodb import connect_to_mongo, close_mongo_connection
-from app.routes import auth, users, properties, bookings
+from app.routes import auth, users, properties, bookings, reviews
 
 # Create FastAPI app
 app = FastAPI(
@@ -25,6 +25,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
 app.include_router(properties.router, prefix="/api")
 app.include_router(bookings.router, prefix="/api")
+app.include_router(reviews.router, prefix="/api")
 
 # Database connection events
 @app.on_event("startup")
@@ -37,17 +38,20 @@ async def shutdown_db_client():
 
 # Root endpoint
 @app.get("/")
+@app.get("/api/")
 async def root():
     return {
         "message": "Welcome to Wild Welcome API",
         "version": "1.0.0",
-        "docs": "/docs"
+        "docs": "/docs",
+        "status": "running"
     }
 
 # Health check endpoint
 @app.get("/health")
+@app.get("/api/health")
 async def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy", "timestamp": "2025-01-20", "service": "Wild Welcome API"}
 
 if __name__ == "__main__":
     import uvicorn

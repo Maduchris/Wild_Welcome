@@ -57,7 +57,17 @@ async def get_properties(
     # Get properties
     properties = await db.properties.find(filter_query).skip(skip).limit(limit).to_list(None)
     
-    return [Property(**prop) for prop in properties]
+    # Convert ObjectIds to strings
+    converted_properties = []
+    for prop in properties:
+        if "_id" in prop:
+            prop["id"] = str(prop["_id"])
+            del prop["_id"]
+        if "landlord_id" in prop:
+            prop["landlord_id"] = str(prop["landlord_id"])
+        converted_properties.append(Property(**prop))
+    
+    return converted_properties
 
 
 @router.get("/search", response_model=List[Property])
@@ -107,7 +117,17 @@ async def search_properties(
     
     properties = await db.properties.find(filter_query).skip(skip).limit(limit).to_list(None)
     
-    return [Property(**prop) for prop in properties]
+    # Convert ObjectIds to strings
+    converted_properties = []
+    for prop in properties:
+        if "_id" in prop:
+            prop["id"] = str(prop["_id"])
+            del prop["_id"]
+        if "landlord_id" in prop:
+            prop["landlord_id"] = str(prop["landlord_id"])
+        converted_properties.append(Property(**prop))
+    
+    return converted_properties
 
 
 @router.get("/{property_id}", response_model=Property)
@@ -124,6 +144,13 @@ async def get_property(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Property not found"
             )
+        
+        # Convert ObjectIds to strings
+        if "_id" in property_data:
+            property_data["id"] = str(property_data["_id"])
+            del property_data["_id"]
+        if "landlord_id" in property_data:
+            property_data["landlord_id"] = str(property_data["landlord_id"])
         
         return Property(**property_data)
         
@@ -152,6 +179,11 @@ async def create_property(
     
     # Get created property
     created_property = await db.properties.find_one({"_id": result.inserted_id})
+    
+    # Convert ObjectId fields to strings for the response model
+    created_property["id"] = str(created_property["_id"])
+    created_property["landlord_id"] = str(created_property["landlord_id"])
+    del created_property["_id"]  # Remove _id since we're using id
     
     return Property(**created_property)
 
@@ -189,6 +221,11 @@ async def update_property(
     # Get updated property
     updated_property = await db.properties.find_one({"_id": ObjectId(property_id)})
     
+    # Convert ObjectId fields to strings for the response model
+    updated_property["id"] = str(updated_property["_id"])
+    updated_property["landlord_id"] = str(updated_property["landlord_id"])
+    del updated_property["_id"]  # Remove _id since we're using id
+    
     return Property(**updated_property)
 
 
@@ -211,10 +248,9 @@ async def delete_property(
             detail="Property not found or not owned by you"
         )
     
-    # Soft delete - mark as inactive
-    await db.properties.update_one(
-        {"_id": ObjectId(property_id)},
-        {"$set": {"is_active": False, "updated_at": datetime.utcnow()}}
+    # Hard delete - actually remove the property
+    await db.properties.delete_one(
+        {"_id": ObjectId(property_id)}
     )
     
     return {"message": "Property deleted successfully"}
@@ -290,4 +326,12 @@ async def get_landlord_properties(
         {"landlord_id": ObjectId(current_user.id)}
     ).skip(skip).limit(limit).to_list(None)
     
-    return [Property(**prop) for prop in properties]
+    # Convert ObjectId fields to strings for response models
+    converted_properties = []
+    for prop in properties:
+        prop["id"] = str(prop["_id"])
+        prop["landlord_id"] = str(prop["landlord_id"])
+        del prop["_id"]
+        converted_properties.append(Property(**prop))
+    
+    return converted_properties

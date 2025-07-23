@@ -1,103 +1,110 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import Header from '../../components/ui/Header';
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
+import toast from 'react-hot-toast';
+import { FaHome, FaCalendarAlt, FaDollarSign, FaChartLine, FaPlus, FaBuilding, FaEye } from 'react-icons/fa';
+import LandlordHeader from '../../components/landlord/LandlordHeader';
+import { propertiesAPI, bookingsAPI } from '../../services/api';
+import {
+  Card,
+  Button,
+  ThemedComponentProvider
+} from '../../components/ui/ThemeProvider';
 
 const DashboardContainer = styled.div`
   min-height: 100vh;
   background-color: ${props => props.theme.colors.background};
 `;
 
+
 const MainContent = styled.main`
   max-width: 1200px;
   margin: 0 auto;
-  padding: ${props => props.theme.spacing.xl};
+  padding: 1.5rem;
 `;
 
 const WelcomeSection = styled.section`
-  margin-bottom: ${props => props.theme.spacing.xxxl};
+  margin-bottom: 3rem;
 `;
 
 const WelcomeTitle = styled.h1`
-  font-size: ${props => props.theme.typography.fontSizes['3xl']};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
+  font-size: 2.5rem;
+  font-weight: 700;
   color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.sm};
+  margin-bottom: 0.5rem;
 `;
 
 const WelcomeSubtitle = styled.p`
-  font-size: ${props => props.theme.typography.fontSizes.lg};
+  font-size: 1.25rem;
   color: ${props => props.theme.colors.textSecondary};
 `;
 
 const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: ${props => props.theme.spacing.xl};
-  margin-bottom: ${props => props.theme.spacing.xxxl};
+  gap: 1.5rem;
+  margin-bottom: 3rem;
 `;
 
 const StatCard = styled(Card)`
   text-align: center;
-  padding: ${props => props.theme.spacing.xl};
+  padding: 1.5rem;
 `;
 
 const StatIcon = styled.div`
   width: 60px;
   height: 60px;
-  background-color: ${props => props.iconColor || props.theme.colors.primaryLight};
+  background-color: ${props => props.iconColor || props.theme.colors.accent};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto ${props => props.theme.spacing.lg};
-  font-size: ${props => props.theme.typography.fontSizes.xl};
+  margin: 0 auto 1rem;
+  font-size: 1.25rem;
   color: ${props => props.iconTextColor || props.theme.colors.primary};
 `;
 
 const StatNumber = styled.div`
-  font-size: ${props => props.theme.typography.fontSizes['3xl']};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
+  font-size: 2rem;
+  font-weight: 700;
   color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.sm};
+  margin-bottom: 0.5rem;
 `;
 
 const StatLabel = styled.p`
   color: ${props => props.theme.colors.textSecondary};
-  font-size: ${props => props.theme.typography.fontSizes.base};
+  font-size: 1rem;
   margin: 0;
 `;
 
 const ContentGrid = styled.div`
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: ${props => props.theme.spacing.xl};
+  gap: 1.5rem;
   
-  @media (max-width: ${props => props.theme.breakpoints.lg}) {
+  @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
 `;
 
 const RecentBookings = styled(Card)`
-  margin-bottom: ${props => props.theme.spacing.xl};
+  margin-bottom: 1.5rem;
 `;
 
 const SectionTitle = styled.h2`
-  font-size: ${props => props.theme.typography.fontSizes.xl};
-  font-weight: ${props => props.theme.typography.fontWeights.semibold};
+  font-size: 1.25rem;
+  font-weight: 600;
   color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.lg};
+  margin-bottom: 1rem;
 `;
 
 const BookingItem = styled.div`
   display: flex;
   align-items: center;
-  gap: ${props => props.theme.spacing.lg};
-  padding: ${props => props.theme.spacing.lg};
-  border-bottom: 1px solid ${props => props.theme.colors.borderLight};
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid ${props => props.theme.colors.border};
   
   &:last-child {
     border-bottom: none;
@@ -107,13 +114,13 @@ const BookingItem = styled.div`
 const BookingAvatar = styled.div`
   width: 50px;
   height: 50px;
-  background-color: ${props => props.theme.colors.gray[200]};
+  background-color: ${props => props.theme.colors.accent};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
-  color: ${props => props.theme.colors.gray[600]};
+  font-weight: 700;
+  color: ${props => props.theme.colors.text};
 `;
 
 const BookingInfo = styled.div`
@@ -121,273 +128,416 @@ const BookingInfo = styled.div`
 `;
 
 const BookingTitle = styled.h4`
-  font-size: ${props => props.theme.typography.fontSizes.base};
-  font-weight: ${props => props.theme.typography.fontWeights.semibold};
+  font-size: 1rem;
+  font-weight: 600;
   color: ${props => props.theme.colors.text};
-  margin: 0 0 ${props => props.theme.spacing.xs} 0;
+  margin: 0 0 0.25rem 0;
 `;
 
 const BookingDetails = styled.p`
-  font-size: ${props => props.theme.typography.fontSizes.sm};
+  font-size: 0.875rem;
   color: ${props => props.theme.colors.textSecondary};
   margin: 0;
 `;
 
 const BookingStatus = styled.span`
-  padding: ${props => props.theme.spacing.xs} ${props => props.theme.spacing.sm};
-  border-radius: ${props => props.theme.borderRadius.sm};
-  font-size: ${props => props.theme.typography.fontSizes.xs};
-  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
   background-color: ${props => {
     switch (props.status) {
-      case 'approved':
-        return props.theme.colors.success;
-      case 'pending':
-        return props.theme.colors.warning;
-      case 'rejected':
-        return props.theme.colors.error;
-      default:
-        return props.theme.colors.gray[500];
+      case 'pending': return '#FEF3C7';
+      case 'approved': return '#D1FAE5';
+      case 'rejected': return '#FEE2E2';
+      default: return props.theme.colors.surface;
     }
   }};
-  color: ${props => props.theme.colors.white};
+  color: ${props => {
+    switch (props.status) {
+      case 'pending': return '#92400E';
+      case 'approved': return '#065F46';
+      case 'rejected': return '#991B1B';
+      default: return props.theme.colors.textSecondary;
+    }
+  }};
 `;
 
 const QuickActions = styled(Card)`
-  padding: ${props => props.theme.spacing.xl};
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
 `;
 
 const ActionButton = styled(Button)`
   width: 100%;
-  margin-bottom: ${props => props.theme.spacing.md};
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-weight: 500;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  min-height: 44px;
+  border-radius: 0.5rem;
   
   &:last-child {
     margin-bottom: 0;
   }
-`;
-
-const RecentActivity = styled(Card)`
-  margin-top: ${props => props.theme.spacing.xl};
-`;
-
-const ActivityItem = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: ${props => props.theme.spacing.md};
-  padding: ${props => props.theme.spacing.md};
-  border-bottom: 1px solid ${props => props.theme.colors.borderLight};
   
-  &:last-child {
-    border-bottom: none;
+  svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
   }
 `;
 
-const ActivityIcon = styled.div`
-  width: 32px;
-  height: 32px;
-  background-color: ${props => props.theme.colors.primaryLight};
-  border-radius: 50%;
+const PropertyCard = styled(Card)`
+  margin-bottom: 1rem;
+`;
+
+const EmptyPropertiesCard = styled(Card)`
+  text-align: center;
+  padding: 3rem;
+  border: 2px dashed ${props => props.theme.colors.border};
+  background-color: ${props => props.theme.colors.surface};
+`;
+
+const EmptyIcon = styled.div`
+  font-size: 48px;
+  color: ${props => props.theme.colors.textSecondary};
+  margin-bottom: 1rem;
+  opacity: 0.5;
+`;
+
+const EmptyTitle = styled.h3`
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: ${props => props.theme.colors.text};
+  margin: 0 0 0.5rem 0;
+`;
+
+const EmptyDescription = styled.p`
+  font-size: 0.875rem;
+  color: ${props => props.theme.colors.textSecondary};
+  margin: 0 0 1rem 0;
+`;
+
+const EmptyActionButton = styled(Button)`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+`;
+
+const PropertyImage = styled.div`
+  width: 100%;
+  height: 150px;
+  background-color: ${props => props.theme.colors.accent};
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  color: ${props => props.theme.colors.primary};
-  flex-shrink: 0;
-`;
-
-const ActivityContent = styled.div`
-  flex: 1;
-`;
-
-const ActivityText = styled.p`
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  color: ${props => props.theme.colors.text};
-  margin: 0 0 ${props => props.theme.spacing.xs} 0;
-`;
-
-const ActivityTime = styled.span`
-  font-size: ${props => props.theme.typography.fontSizes.xs};
   color: ${props => props.theme.colors.textSecondary};
+  font-size: 1.5rem;
+`;
+
+const PropertyTitle = styled.h4`
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: ${props => props.theme.colors.text};
+  margin: 0 0 0.5rem 0;
+`;
+
+const PropertyLocation = styled.p`
+  color: ${props => props.theme.colors.textSecondary};
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem 0;
+`;
+
+const PropertyStats = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const PropertyPrice = styled.span`
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: ${props => props.theme.colors.primary};
+`;
+
+const PropertyOccupancy = styled.span`
+  font-size: 0.875rem;
+  color: ${props => props.theme.colors.textSecondary};
+`;
+
+const EmptyBookingsContainer = styled.div`
+  text-align: center;
+  padding: 2rem;
+  color: ${props => props.theme.colors.textSecondary};
+  
+  p {
+    margin: 0 0 0.5rem 0;
+    
+    &:last-child {
+      font-size: 0.875rem;
+    }
+  }
 `;
 
 const LandlordDashboard = () => {
   const [stats, setStats] = useState({
-    totalProperties: 12,
-    occupiedUnits: 8,
-    availableUnits: 4,
-    totalRevenue: 45000,
-    pendingBookings: 3,
-    maintenanceRequests: 2
+    totalProperties: 0,
+    activeBookings: 0,
+    monthlyRevenue: 0,
+    occupancyRate: 0,
   });
 
-  const [recentBookings, setRecentBookings] = useState([
-        {
-          id: 1,
-      tenant: 'John Smith',
-      property: 'Cozy Studio in Kigali City Center',
-      date: '2024-02-15',
-      status: 'approved',
-      amount: 120
-        },
-        {
-          id: 2,
-      tenant: 'Sarah Johnson',
-      property: 'Modern 2BR Apartment in Remera',
-      date: '2024-02-14',
-      status: 'pending',
-      amount: 280
-        },
-        {
-          id: 3,
-      tenant: 'Mike Wilson',
-      property: 'Luxury Suite in Nyarutarama',
-      date: '2024-02-13',
-          status: 'rejected',
-      amount: 450
-    }
-      ]);
+  const [recentBookings, setRecentBookings] = useState([]);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [recentActivity, setRecentActivity] = useState([
-        {
-          id: 1,
-      type: 'booking',
-      text: 'New booking request from John Smith',
-      time: '2 hours ago'
-        },
-        {
-          id: 2,
-      type: 'maintenance',
-      text: 'Maintenance request submitted for Unit 3B',
-      time: '4 hours ago'
-    },
-    {
-      id: 3,
-      type: 'payment',
-      text: 'Rent payment received from Sarah Johnson',
-      time: '1 day ago'
-    },
-    {
-      id: 4,
-      type: 'booking',
-      text: 'Booking approved for Mike Wilson',
-      time: '2 days ago'
-    }
-  ]);
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+
+        // Current user handled by LandlordHeader component
+
+        // Fetch landlord's properties
+        const propertiesData = await propertiesAPI.getMyProperties();
+        setProperties(Array.isArray(propertiesData) ? propertiesData : []);
+
+        // Fetch booking requests
+        const bookingsData = await bookingsAPI.getLandlordApplications();
+        setRecentBookings(bookingsData?.slice(0, 5) || []); // Show latest 5 bookings
+
+        // Calculate stats from properties and bookings
+        const totalProperties = propertiesData?.length || 0;
+        const activeBookings = bookingsData?.filter(b => b.status === 'approved')?.length || 0;
+        
+        // Calculate monthly revenue (sum of approved bookings)
+        const monthlyRevenue = propertiesData?.reduce((total, prop) => {
+          return total + (prop.rent_amount || prop.price || 0);
+        }, 0) || 0;
+
+        // Calculate occupancy rate (approved bookings / total properties)
+        const occupancyRate = totalProperties > 0 ? Math.round((activeBookings / totalProperties) * 100) : 0;
+
+        setStats({
+          totalProperties,
+          activeBookings,
+          monthlyRevenue,
+          occupancyRate,
+        });
+
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        toast.error('Failed to load dashboard data');
+        
+        // Fallback to mock data
+        setStats({
+          totalProperties: 0,
+          activeBookings: 0,
+          monthlyRevenue: 0,
+          occupancyRate: 0,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+  
+
+  if (loading) {
+    return (
+      <ThemedComponentProvider>
+        <DashboardContainer>
+          <LandlordHeader />
+          <MainContent>
+            <WelcomeSection>
+              <WelcomeTitle>Loading...</WelcomeTitle>
+              <WelcomeSubtitle>Fetching your dashboard data...</WelcomeSubtitle>
+            </WelcomeSection>
+          </MainContent>
+        </DashboardContainer>
+      </ThemedComponentProvider>
+    );
+  }
 
   return (
-    <DashboardContainer>
-      <Header userType="landlord" userInitials="LS" />
+    <ThemedComponentProvider>
+      <DashboardContainer>
+      <LandlordHeader />
 
       <MainContent>
         <WelcomeSection>
-          <WelcomeTitle>Welcome back, Sarah!</WelcomeTitle>
+          <WelcomeTitle>
+            Welcome back, Landlord!
+          </WelcomeTitle>
           <WelcomeSubtitle>
             Here's what's happening with your properties today.
           </WelcomeSubtitle>
         </WelcomeSection>
 
         <StatsGrid>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             <StatCard>
-            <StatIcon iconColor="#d1fae5" iconTextColor="#059669">
-              🏠
-            </StatIcon>
+              <StatIcon>
+                <FaHome />
+              </StatIcon>
               <StatNumber>{stats.totalProperties}</StatNumber>
               <StatLabel>Total Properties</StatLabel>
             </StatCard>
+          </motion.div>
 
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
             <StatCard>
-            <StatIcon iconColor="#dbeafe" iconTextColor="#2563eb">
-              👥
-            </StatIcon>
-            <StatNumber>{stats.occupiedUnits}</StatNumber>
-            <StatLabel>Occupied Units</StatLabel>
+              <StatIcon>
+                <FaCalendarAlt />
+              </StatIcon>
+              <StatNumber>{stats.activeBookings}</StatNumber>
+              <StatLabel>Active Bookings</StatLabel>
             </StatCard>
+          </motion.div>
 
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             <StatCard>
-            <StatIcon iconColor="#fef3c7" iconTextColor="#d97706">
-              🔓
-            </StatIcon>
-            <StatNumber>{stats.availableUnits}</StatNumber>
-            <StatLabel>Available Units</StatLabel>
+              <StatIcon>
+                <FaDollarSign />
+              </StatIcon>
+              <StatNumber>${stats.monthlyRevenue.toLocaleString()}</StatNumber>
+              <StatLabel>Monthly Revenue</StatLabel>
             </StatCard>
+          </motion.div>
 
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
             <StatCard>
-            <StatIcon iconColor="#f3e8ff" iconTextColor="#7c3aed">
-              💰
-            </StatIcon>
-            <StatNumber>${stats.totalRevenue.toLocaleString()}</StatNumber>
-            <StatLabel>Monthly Revenue</StatLabel>
+              <StatIcon>
+                <FaChartLine />
+              </StatIcon>
+              <StatNumber>{stats.occupancyRate}%</StatNumber>
+              <StatLabel>Occupancy Rate</StatLabel>
             </StatCard>
+          </motion.div>
         </StatsGrid>
 
         <ContentGrid>
           <div>
             <RecentBookings>
               <SectionTitle>Recent Booking Requests</SectionTitle>
-              {recentBookings.map(booking => (
-                <BookingItem key={booking.id}>
+              {recentBookings.length === 0 ? (
+                <EmptyBookingsContainer>
+                  <p>No booking requests yet</p>
+                  <p style={{fontSize: '0.875rem'}}>Booking requests will appear here when users apply for your properties.</p>
+                </EmptyBookingsContainer>
+              ) : (
+                recentBookings.map((booking, index) => (
+                <motion.div
+                  key={booking.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <BookingItem>
                     <BookingAvatar>
-                      {booking.tenant.split(' ').map(n => n[0]).join('')}
+                      {booking.user_name ? booking.user_name.split(' ').map(n => n[0]).join('') : 'U'}
                     </BookingAvatar>
                     <BookingInfo>
-                      <BookingTitle>{booking.tenant}</BookingTitle>
+                      <BookingTitle>{booking.user_name || 'User'}</BookingTitle>
                       <BookingDetails>
-                      {booking.property} • ${booking.amount}/month
+                        {booking.property_title || 'Property'} • {new Date(booking.created_at || booking.date).toLocaleDateString()}
                       </BookingDetails>
                     </BookingInfo>
                     <BookingStatus status={booking.status}>
-                    {booking.status}
+                      {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                     </BookingStatus>
                   </BookingItem>
-              ))}
+                </motion.div>
+                ))
+              )}
             </RecentBookings>
           </div>
 
           <div>
             <QuickActions>
               <SectionTitle>Quick Actions</SectionTitle>
-              <Link to="/landlord/add-property" style={{ textDecoration: 'none' }}>
-                <ActionButton variant="primary">
-                  Add New Property
-                </ActionButton>
-              </Link>
-              <Link to="/landlord/booking-request" style={{ textDecoration: 'none' }}>
-                <ActionButton variant="outline">
-                  View All Bookings
-                </ActionButton>
-              </Link>
-              <Link to="/landlord/properties" style={{ textDecoration: 'none' }}>
-                <ActionButton variant="outline">
-                  Manage Properties
-                </ActionButton>
-              </Link>
-              <Link to="/landlord/calendar" style={{ textDecoration: 'none' }}>
-                <ActionButton variant="outline">
-                  View Calendar
-                </ActionButton>
-              </Link>
+              <ActionButton as={Link} to="/landlord/add-room">
+                <FaPlus style={{ marginRight: '8px' }} />
+                Add New Property
+              </ActionButton>
+              <ActionButton as={Link} to="/landlord/properties" variant="outline">
+                <FaBuilding style={{ marginRight: '8px' }} />
+                Manage Properties
+              </ActionButton>
+              <ActionButton as={Link} to="/landlord/booking-request" variant="outline">
+                <FaEye style={{ marginRight: '8px' }} />
+                View All Bookings
+              </ActionButton>
             </QuickActions>
 
-            <RecentActivity>
-              <SectionTitle>Recent Activity</SectionTitle>
-              {recentActivity.map(activity => (
-                <ActivityItem key={activity.id}>
-                  <ActivityIcon>
-                    {activity.type === 'booking' && '📋'}
-                    {activity.type === 'maintenance' && '🔧'}
-                    {activity.type === 'payment' && '💰'}
-                  </ActivityIcon>
-                  <ActivityContent>
-                    <ActivityText>{activity.text}</ActivityText>
-                    <ActivityTime>{activity.time}</ActivityTime>
-                  </ActivityContent>
-                </ActivityItem>
-              ))}
-            </RecentActivity>
+            <SectionTitle>Your Properties</SectionTitle>
+            {!properties || properties.length === 0 ? (
+              <EmptyPropertiesCard>
+                <EmptyIcon>
+                  <FaHome />
+                </EmptyIcon>
+                <EmptyTitle>No properties yet</EmptyTitle>
+                <EmptyDescription>
+                  Add your first property to start managing your rental business!
+                </EmptyDescription>
+                <EmptyActionButton as={Link} to="/landlord/add-room">
+                  <FaPlus />
+                  Add Your First Property
+                </EmptyActionButton>
+              </EmptyPropertiesCard>
+            ) : (
+              properties.slice(0, 3).map((property, index) => (
+              <motion.div
+                key={property.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <PropertyCard>
+                  <PropertyImage>
+                    {property.images && property.images.length > 0 ? (
+                      <img src={property.images[0]} alt={property.title} style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px'}} />
+                    ) : <FaHome size={40} />}
+                  </PropertyImage>
+                  <PropertyTitle>{property.title}</PropertyTitle>
+                  <PropertyLocation>{property.location?.address || property.address || 'Address not available'}</PropertyLocation>
+                  <PropertyStats>
+                    <PropertyPrice>${property.price_per_night || property.rent_amount || property.price}/night</PropertyPrice>
+                    <PropertyOccupancy>{property.is_active ? 'Available' : 'Inactive'}</PropertyOccupancy>
+                  </PropertyStats>
+                </PropertyCard>
+              </motion.div>
+              ))
+            )}
           </div>
         </ContentGrid>
       </MainContent>
-    </DashboardContainer>
+      </DashboardContainer>
+    </ThemedComponentProvider>
   );
 };
 

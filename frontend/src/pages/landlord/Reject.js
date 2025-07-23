@@ -13,18 +13,18 @@ const Reject = () => {
 
   // Mock booking data
   const booking = {
-    id: bookingId ? parseInt(bookingId) : 1,
+    id: bookingId || 1,
     title: "Booking Request from John Smith",
-    property: "Cozy Studio in Kigali City Center",
+    property: "Cozy Studio in Downtown",
     applicant: {
       name: "John Smith",
       email: "john.smith@email.com",
-      phone: "+250 788 123 456",
+      phone: "+1 (555) 123-4567",
       avatar: "JS"
     },
     moveInDate: "2024-02-15",
     duration: "12 months",
-    rent: "$120/month"
+    rent: "$1,200/month"
   };
 
   const rejectionReasons = [

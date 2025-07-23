@@ -6,14 +6,21 @@ from bson import ObjectId
 
 class PyObjectId(ObjectId):
     @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+    def __get_pydantic_core_schema__(cls, source_type, handler):
+        from pydantic_core import core_schema
+        return core_schema.no_info_before_validator_function(
+            cls.validate,
+            core_schema.str_schema(),
+            serialization=core_schema.to_string_ser_schema()
+        )
 
     @classmethod
     def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return ObjectId(v)
+        if isinstance(v, ObjectId):
+            return v
+        if isinstance(v, str) and ObjectId.is_valid(v):
+            return ObjectId(v)
+        raise ValueError("Invalid ObjectId")
 
     @classmethod
     def __get_pydantic_json_schema__(cls, field_schema, model_schema):
@@ -28,6 +35,7 @@ class UserBase(BaseModel):
     phone: Optional[str] = None
     user_type: str = Field(..., pattern="^(user|landlord)$")
     profile_image: Optional[str] = None
+    favourites: List[str] = Field(default_factory=list)
     is_active: bool = True
     is_verified: bool = False
 
@@ -46,6 +54,8 @@ class UserUpdate(BaseModel):
 class UserInDB(UserBase):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     hashed_password: str
+    refresh_token: Optional[str] = None
+    refresh_token_expires_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
@@ -56,7 +66,7 @@ class UserInDB(UserBase):
 
 
 class User(UserBase):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    id: str = Field(...)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
@@ -64,7 +74,6 @@ class User(UserBase):
         populate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-        from_attributes = True
 
 
 class UserLogin(BaseModel):
@@ -74,12 +83,8 @@ class UserLogin(BaseModel):
 
 class Token(BaseModel):
     access_token: str
-    refresh_token: Optional[str] = None
-    token_type: str
-
-
-class TokenRefresh(BaseModel):
     refresh_token: str
+    token_type: str
 
 
 class TokenData(BaseModel):

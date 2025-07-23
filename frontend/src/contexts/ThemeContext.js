@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { lightTheme, darkTheme } from '../styles/theme';
+import { themes } from '../styles/theme';
 
 const ThemeContext = createContext();
 
@@ -12,70 +11,47 @@ export const useTheme = () => {
   return context;
 };
 
-// Helper function to check if current route is a general page
-const isGeneralPage = (pathname) => {
-  const generalRoutes = ['/', '/login', '/signup', '/confirmation'];
-  return generalRoutes.includes(pathname);
-};
-
 export const ThemeProvider = ({ children }) => {
-  const location = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage for saved theme preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      return savedTheme === 'dark';
+    // Check localStorage for saved preference
+    const saved = localStorage.getItem('wildWelcomeTheme');
+    if (saved) {
+      return saved === 'dark';
     }
-    // Check system preference
+    // Check system preference as fallback
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
-  // Use dark theme for non-general pages by default, but allow user to override
-  const isGeneral = isGeneralPage(location.pathname);
-  const effectiveDarkMode = isDarkMode;
-  const theme = effectiveDarkMode ? darkTheme : lightTheme;
+  const currentTheme = isDarkMode ? themes.dark : themes.light;
 
   const toggleTheme = () => {
-    console.log('Toggling theme from:', isDarkMode ? 'dark' : 'light', 'to:', !isDarkMode ? 'dark' : 'light');
-    setIsDarkMode(prev => !prev);
+    setIsDarkMode(prev => {
+      const newMode = !prev;
+      localStorage.setItem('wildWelcomeTheme', newMode ? 'dark' : 'light');
+      return newMode;
+    });
   };
-
-  const setTheme = (mode) => {
-    console.log('Setting theme to:', mode);
-    setIsDarkMode(mode === 'dark');
-  };
-
-  // Save theme preference to localStorage
-  useEffect(() => {
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    
-    // Update document body class for global CSS
-    document.body.classList.toggle('dark-mode', effectiveDarkMode);
-    document.body.classList.toggle('light-mode', !effectiveDarkMode);
-    
-    console.log('Theme changed to:', effectiveDarkMode ? 'dark' : 'light', 'isGeneral:', isGeneral);
-  }, [isDarkMode, effectiveDarkMode, isGeneral]);
 
   // Listen for system theme changes
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e) => {
-      // Only auto-switch if user hasn't manually set a preference
-      if (!localStorage.getItem('theme')) {
+      // Only update if user hasn't manually set a preference
+      const saved = localStorage.getItem('wildWelcomeTheme');
+      if (!saved) {
         setIsDarkMode(e.matches);
       }
     };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
   }, []);
 
   const value = {
-    theme,
-    isDarkMode: effectiveDarkMode,
+    isDarkMode,
+    currentTheme,
     toggleTheme,
-    setTheme,
-    isGeneralPage: isGeneral,
+    themeName: isDarkMode ? 'dark' : 'light'
   };
 
   return (
@@ -83,4 +59,4 @@ export const ThemeProvider = ({ children }) => {
       {children}
     </ThemeContext.Provider>
   );
-}; 
+};

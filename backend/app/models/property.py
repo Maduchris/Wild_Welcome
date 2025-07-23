@@ -41,6 +41,7 @@ class PropertyBase(BaseModel):
     bedrooms: int = Field(..., ge=1, le=10)
     bathrooms: int = Field(..., ge=1, le=10)
     price_per_night: float = Field(..., ge=0)
+    security_deposit: Optional[float] = Field(None, ge=0)
     location: Location
     amenities: Amenities
     images: List[str] = []
@@ -60,6 +61,7 @@ class PropertyUpdate(BaseModel):
     bedrooms: Optional[int] = None
     bathrooms: Optional[int] = None
     price_per_night: Optional[float] = None
+    security_deposit: Optional[float] = None
     location: Optional[Location] = None
     amenities: Optional[Amenities] = None
     images: Optional[List[str]] = None
@@ -80,8 +82,8 @@ class PropertyInDB(PropertyBase):
 
 
 class Property(PropertyBase):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    landlord_id: PyObjectId
+    id: str = Field(...)
+    landlord_id: str = Field(...)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     

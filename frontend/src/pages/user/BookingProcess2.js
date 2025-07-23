@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import styled from 'styled-components';
-import { motion } from 'framer-motion';
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import styled from "styled-components";
+import { motion } from "framer-motion";
+import { FaHome } from "react-icons/fa";
+import Button from "../../components/ui/Button";
+import Card from "../../components/ui/Card";
 
 const BookingContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, ${props => props.theme.colors.primary} 0%, ${props => props.theme.colors.primaryDark} 100%);
+  background: linear-gradient(
+    135deg,
+    ${(props) => props.theme.colors.primary} 0%,
+    ${(props) => props.theme.colors.primaryDark} 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: ${props => props.theme.spacing.xl};
+  padding: ${(props) => props.theme.spacing.xl};
 `;
 
 const BookingCard = styled(motion.div)`
@@ -22,30 +27,30 @@ const BookingCard = styled(motion.div)`
 const ProgressBar = styled.div`
   width: 100%;
   height: 4px;
-  background-color: ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius.full};
-  margin-bottom: ${props => props.theme.spacing.xl};
+  background-color: ${(props) => props.theme.colors.border};
+  border-radius: ${(props) => props.theme.borderRadius.full};
+  margin-bottom: ${(props) => props.theme.spacing.xl};
   overflow: hidden;
 `;
 
 const ProgressFill = styled.div`
   height: 100%;
-  background-color: ${props => props.theme.colors.white};
+  background-color: ${(props) => props.theme.colors.white};
   width: 66%;
-  transition: width ${props => props.theme.transitions.normal};
+  transition: width ${(props) => props.theme.transitions.normal};
 `;
 
 const StepIndicator = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-bottom: ${props => props.theme.spacing.xl};
+  margin-bottom: ${(props) => props.theme.spacing.xl};
 `;
 
 const Step = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: ${props => props.theme.spacing.sm};
+  gap: ${(props) => props.theme.spacing.sm};
 `;
 
 const StepNumber = styled.div`
@@ -55,39 +60,45 @@ const StepNumber = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  background-color: ${props => props.isActive ? props.theme.colors.white : 'rgba(255, 255, 255, 0.3)'};
-  color: ${props => props.isActive ? props.theme.colors.primary : props.theme.colors.white};
+  font-weight: ${(props) => props.theme.typography.fontWeights.bold};
+  font-size: ${(props) => props.theme.typography.fontSizes.sm};
+  background-color: ${(props) =>
+    props.isActive ? props.theme.colors.white : "rgba(255, 255, 255, 0.3)"};
+  color: ${(props) =>
+    props.isActive ? props.theme.colors.primary : props.theme.colors.white};
 `;
 
 const StepLabel = styled.span`
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  color: ${props => props.isActive ? props.theme.colors.white : 'rgba(255, 255, 255, 0.7)'};
-  font-weight: ${props => props.isActive ? props.theme.typography.fontWeights.medium : props.theme.typography.fontWeights.normal};
+  font-size: ${(props) => props.theme.typography.fontSizes.sm};
+  color: ${(props) =>
+    props.isActive ? props.theme.colors.white : "rgba(255, 255, 255, 0.7)"};
+  font-weight: ${(props) =>
+    props.isActive
+      ? props.theme.typography.fontWeights.medium
+      : props.theme.typography.fontWeights.normal};
 `;
 
 const Title = styled.h1`
   text-align: center;
-  font-size: ${props => props.theme.typography.fontSizes['3xl']};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
-  color: ${props => props.theme.colors.white};
-  margin-bottom: ${props => props.theme.spacing.md};
+  font-size: ${(props) => props.theme.typography.fontSizes["3xl"]};
+  font-weight: ${(props) => props.theme.typography.fontWeights.bold};
+  color: ${(props) => props.theme.colors.white};
+  margin-bottom: ${(props) => props.theme.spacing.md};
 `;
 
 const Subtitle = styled.p`
   text-align: center;
-  font-size: ${props => props.theme.typography.fontSizes.lg};
-  color: ${props => props.theme.colors.gray[100]};
-  margin-bottom: ${props => props.theme.spacing.xl};
+  font-size: ${(props) => props.theme.typography.fontSizes.lg};
+  color: ${(props) => props.theme.colors.gray[100]};
+  margin-bottom: ${(props) => props.theme.spacing.xl};
 `;
 
 const ContentGrid = styled.div`
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: ${props => props.theme.spacing.xl};
-  
-  @media (max-width: ${props => props.theme.breakpoints.lg}) {
+  gap: ${(props) => props.theme.spacing.xl};
+
+  @media (max-width: ${(props) => props.theme.breakpoints.lg}) {
     grid-template-columns: 1fr;
   }
 `;
@@ -95,76 +106,76 @@ const ContentGrid = styled.div`
 const ReviewSection = styled.div``;
 
 const Section = styled.div`
-  margin-bottom: ${props => props.theme.spacing.xl};
+  margin-bottom: ${(props) => props.theme.spacing.xl};
 `;
 
 const SectionTitle = styled.h3`
-  font-size: ${props => props.theme.typography.fontSizes.lg};
-  font-weight: ${props => props.theme.typography.fontWeights.semibold};
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.md};
-  padding-bottom: ${props => props.theme.spacing.sm};
-  border-bottom: 1px solid ${props => props.theme.colors.borderLight};
+  font-size: ${(props) => props.theme.typography.fontSizes.lg};
+  font-weight: ${(props) => props.theme.typography.fontWeights.semibold};
+  color: ${(props) => props.theme.colors.text};
+  margin-bottom: ${(props) => props.theme.spacing.md};
+  padding-bottom: ${(props) => props.theme.spacing.sm};
+  border-bottom: 1px solid ${(props) => props.theme.colors.borderLight};
 `;
 
 const InfoGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: ${props => props.theme.spacing.md};
+  gap: ${(props) => props.theme.spacing.md};
 `;
 
 const InfoItem = styled.div`
-  padding: ${props => props.theme.spacing.md};
-  background-color: ${props => props.theme.colors.surface};
-  border-radius: ${props => props.theme.borderRadius.md};
+  padding: ${(props) => props.theme.spacing.md};
+  background-color: ${(props) => props.theme.colors.surface};
+  border-radius: ${(props) => props.theme.borderRadius.md};
 `;
 
 const InfoLabel = styled.div`
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  color: ${props => props.theme.colors.textSecondary};
-  margin-bottom: ${props => props.theme.spacing.xs};
+  font-size: ${(props) => props.theme.typography.fontSizes.sm};
+  color: ${(props) => props.theme.colors.textSecondary};
+  margin-bottom: ${(props) => props.theme.spacing.xs};
 `;
 
 const InfoValue = styled.div`
-  font-size: ${props => props.theme.typography.fontSizes.base};
-  color: ${props => props.theme.colors.text};
-  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  font-size: ${(props) => props.theme.typography.fontSizes.base};
+  color: ${(props) => props.theme.colors.text};
+  font-weight: ${(props) => props.theme.typography.fontWeights.medium};
 `;
 
 const PropertyCard = styled(Card)`
-  margin-bottom: ${props => props.theme.spacing.lg};
+  margin-bottom: ${(props) => props.theme.spacing.lg};
 `;
 
 const PropertyImage = styled.div`
   width: 100%;
   height: 150px;
-  background-color: ${props => props.theme.colors.gray[200]};
-  border-radius: ${props => props.theme.borderRadius.md};
-  margin-bottom: ${props => props.theme.spacing.lg};
+  background-color: ${(props) => props.theme.colors.gray[200]};
+  border-radius: ${(props) => props.theme.borderRadius.md};
+  margin-bottom: ${(props) => props.theme.spacing.lg};
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${props => props.theme.colors.gray[500]};
-  font-size: ${props => props.theme.typography.fontSizes['2xl']};
+  color: ${(props) => props.theme.colors.gray[500]};
+  font-size: ${(props) => props.theme.typography.fontSizes["2xl"]};
 `;
 
 const PropertyTitle = styled.h4`
-  font-size: ${props => props.theme.typography.fontSizes.lg};
-  font-weight: ${props => props.theme.typography.fontWeights.semibold};
-  color: ${props => props.theme.colors.text};
-  margin: 0 0 ${props => props.theme.spacing.sm} 0;
+  font-size: ${(props) => props.theme.typography.fontSizes.lg};
+  font-weight: ${(props) => props.theme.typography.fontWeights.semibold};
+  color: ${(props) => props.theme.colors.text};
+  margin: 0 0 ${(props) => props.theme.spacing.sm} 0;
 `;
 
 const PropertyLocation = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  margin: 0 0 ${props => props.theme.spacing.md} 0;
+  color: ${(props) => props.theme.colors.textSecondary};
+  font-size: ${(props) => props.theme.typography.fontSizes.sm};
+  margin: 0 0 ${(props) => props.theme.spacing.md} 0;
 `;
 
 const PropertyPrice = styled.div`
-  font-size: ${props => props.theme.typography.fontSizes.xl};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
-  color: ${props => props.theme.colors.primary};
+  font-size: ${(props) => props.theme.typography.fontSizes.xl};
+  font-weight: ${(props) => props.theme.typography.fontWeights.bold};
+  color: ${(props) => props.theme.colors.primary};
 `;
 
 const SummaryCard = styled(Card)`
@@ -174,44 +185,44 @@ const SummaryCard = styled(Card)`
 `;
 
 const SummaryTitle = styled.h3`
-  font-size: ${props => props.theme.typography.fontSizes.lg};
-  font-weight: ${props => props.theme.typography.fontWeights.semibold};
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.lg};
+  font-size: ${(props) => props.theme.typography.fontSizes.lg};
+  font-weight: ${(props) => props.theme.typography.fontWeights.semibold};
+  color: ${(props) => props.theme.colors.text};
+  margin-bottom: ${(props) => props.theme.spacing.lg};
 `;
 
 const SummaryRow = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-bottom: ${props => props.theme.spacing.sm};
-  
+  margin-bottom: ${(props) => props.theme.spacing.sm};
+
   &:last-child {
     margin-bottom: 0;
-    border-top: 1px solid ${props => props.theme.colors.border};
-    padding-top: ${props => props.theme.spacing.sm};
-    font-weight: ${props => props.theme.typography.fontWeights.semibold};
-    font-size: ${props => props.theme.typography.fontSizes.lg};
+    border-top: 1px solid ${(props) => props.theme.colors.border};
+    padding-top: ${(props) => props.theme.spacing.sm};
+    font-weight: ${(props) => props.theme.typography.fontWeights.semibold};
+    font-size: ${(props) => props.theme.typography.fontSizes.lg};
   }
 `;
 
 const SummaryLabel = styled.span`
-  color: ${props => props.theme.colors.textSecondary};
+  color: ${(props) => props.theme.colors.textSecondary};
 `;
 
 const SummaryValue = styled.span`
-  color: ${props => props.theme.colors.text};
+  color: ${(props) => props.theme.colors.text};
 `;
 
 const TotalValue = styled.span`
-  color: ${props => props.theme.colors.primary};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
+  color: ${(props) => props.theme.colors.primary};
+  font-weight: ${(props) => props.theme.typography.fontWeights.bold};
 `;
 
 const CheckboxContainer = styled.div`
   display: flex;
   align-items: flex-start;
-  gap: ${props => props.theme.spacing.sm};
-  margin: ${props => props.theme.spacing.lg} 0;
+  gap: ${(props) => props.theme.spacing.sm};
+  margin: ${(props) => props.theme.spacing.lg} 0;
 `;
 
 const Checkbox = styled.input`
@@ -219,14 +230,14 @@ const Checkbox = styled.input`
 `;
 
 const CheckboxLabel = styled.label`
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  color: ${props => props.theme.colors.textSecondary};
+  font-size: ${(props) => props.theme.typography.fontSizes.sm};
+  color: ${(props) => props.theme.colors.textSecondary};
   line-height: 1.4;
-  
+
   a {
-    color: ${props => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.primary};
     text-decoration: none;
-    
+
     &:hover {
       text-decoration: underline;
     }
@@ -235,10 +246,10 @@ const CheckboxLabel = styled.label`
 
 const ButtonGroup = styled.div`
   display: flex;
-  gap: ${props => props.theme.spacing.md};
-  margin-top: ${props => props.theme.spacing.xl};
-  
-  @media (max-width: ${props => props.theme.breakpoints.sm}) {
+  gap: ${(props) => props.theme.spacing.md};
+  margin-top: ${(props) => props.theme.spacing.xl};
+
+  @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
     flex-direction: column;
   }
 `;
@@ -246,58 +257,52 @@ const ButtonGroup = styled.div`
 const BookingProcess2 = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const listingId = searchParams.get('listingId');
+  const listingId = searchParams.get("listingId");
   const [isLoading, setIsLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [bookingData, setBookingData] = useState(null);
-  const [property] = useState({
-    id: 1,
-    title: 'Cozy Studio in Kigali City Center',
-    location: 'Kigali, Rwanda',
-    price: 120,
-    features: ['Furnished', 'Private Bathroom', 'WiFi', 'Kitchen'],
-    image: '🏠'
-  });
+  const [property, setProperty] = useState(null);
 
   useEffect(() => {
     // Simulate loading booking data from previous step
     setBookingData({
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@email.com',
-      phone: '+1 (555) 123-4567',
-      moveInDate: '2024-02-01',
-      leaseDuration: '12-months',
-      employer: 'Tech Corp',
-      jobTitle: 'Software Engineer',
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@email.com",
+      phone: "+1 (555) 123-4567",
+      moveInDate: "2024-02-01",
+      leaseDuration: "12-months",
+      employer: "Tech Corp",
+      jobTitle: "Software Engineer",
       monthlyIncome: 5000,
-      aboutMe: 'I am a software engineer looking for a comfortable place to live while working in the city.',
+      aboutMe:
+        "I am a software engineer looking for a comfortable place to live while working in the city.",
     });
 
     // Simulate loading property data
-    // setProperty({
-    //   id: listingId,
-    //   title: 'Cozy Studio in Downtown',
-    //   location: 'Downtown, New York',
-    //   price: 1200,
-    //   image: '🏠',
-    // });
+    setProperty({
+      id: listingId,
+      title: "Cozy Studio in Downtown",
+      location: "Downtown, New York",
+      price: 1200,
+      image: <FaHome />,
+    });
   }, [listingId]);
 
   const handleSubmit = async () => {
     if (!agreedToTerms) {
-      alert('Please agree to the terms and conditions');
+      alert("Please agree to the terms and conditions");
       return;
     }
-    
+
     setIsLoading(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Submitting booking:', { bookingData, property });
-      navigate('/user/applications');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log("Submitting booking:", { bookingData, property });
+      navigate("/user/applications");
     } catch (error) {
-      console.error('Booking submission error:', error);
+      console.error("Booking submission error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -340,7 +345,8 @@ const BookingProcess2 = () => {
 
           <Title>Review Your Application</Title>
           <Subtitle>
-            Please review your information before submitting your booking request
+            Please review your information before submitting your booking
+            request
           </Subtitle>
 
           <ContentGrid>
@@ -360,7 +366,9 @@ const BookingProcess2 = () => {
                 <InfoGrid>
                   <InfoItem>
                     <InfoLabel>Full Name</InfoLabel>
-                    <InfoValue>{bookingData.firstName} {bookingData.lastName}</InfoValue>
+                    <InfoValue>
+                      {bookingData.firstName} {bookingData.lastName}
+                    </InfoValue>
                   </InfoItem>
                   <InfoItem>
                     <InfoLabel>Email</InfoLabel>
@@ -372,15 +380,21 @@ const BookingProcess2 = () => {
                   </InfoItem>
                   <InfoItem>
                     <InfoLabel>Move-in Date</InfoLabel>
-                    <InfoValue>{new Date(bookingData.moveInDate).toLocaleDateString()}</InfoValue>
+                    <InfoValue>
+                      {new Date(bookingData.moveInDate).toLocaleDateString()}
+                    </InfoValue>
                   </InfoItem>
                   <InfoItem>
                     <InfoLabel>Lease Duration</InfoLabel>
-                    <InfoValue>{bookingData.leaseDuration.replace('-', ' ')}</InfoValue>
+                    <InfoValue>
+                      {bookingData.leaseDuration.replace("-", " ")}
+                    </InfoValue>
                   </InfoItem>
                   <InfoItem>
                     <InfoLabel>Monthly Income</InfoLabel>
-                    <InfoValue>${bookingData.monthlyIncome.toLocaleString()}</InfoValue>
+                    <InfoValue>
+                      ${bookingData.monthlyIncome.toLocaleString()}
+                    </InfoValue>
                   </InfoItem>
                 </InfoGrid>
               </Section>
@@ -410,22 +424,22 @@ const BookingProcess2 = () => {
             <div>
               <SummaryCard>
                 <SummaryTitle>Booking Summary</SummaryTitle>
-                
+
                 <SummaryRow>
                   <SummaryLabel>Monthly Rent</SummaryLabel>
                   <SummaryValue>${property.price}</SummaryValue>
                 </SummaryRow>
-                
+
                 <SummaryRow>
                   <SummaryLabel>Security Deposit</SummaryLabel>
                   <SummaryValue>${property.price}</SummaryValue>
                 </SummaryRow>
-                
+
                 <SummaryRow>
                   <SummaryLabel>Application Fee</SummaryLabel>
                   <SummaryValue>$50</SummaryValue>
                 </SummaryRow>
-                
+
                 <SummaryRow>
                   <SummaryLabel>Total</SummaryLabel>
                   <TotalValue>${property.price * 2 + 50}</TotalValue>
@@ -439,12 +453,16 @@ const BookingProcess2 = () => {
                     onChange={(e) => setAgreedToTerms(e.target.checked)}
                   />
                   <CheckboxLabel htmlFor="terms">
-                    I agree to the{' '}
+                    I agree to the{" "}
                     <a href="/terms" target="_blank" rel="noopener noreferrer">
                       Terms of Service
-                    </a>{' '}
-                    and{' '}
-                    <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                    </a>{" "}
+                    and{" "}
+                    <a
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Privacy Policy
                     </a>
                   </CheckboxLabel>
@@ -477,4 +495,4 @@ const BookingProcess2 = () => {
   );
 };
 
-export default BookingProcess2; 
+export default BookingProcess2;

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
+import secrets
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from app.core.config import settings
@@ -26,20 +27,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
     
-    to_encode.update({"exp": expire, "type": "access"})
-    encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
-    return encoded_jwt
-
-
-def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None):
-    """Create JWT refresh token"""
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(days=settings.refresh_token_expire_days)
-    
-    to_encode.update({"exp": expire, "type": "refresh"})
+    to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
     return encoded_jwt
 
@@ -53,23 +41,16 @@ def verify_token(token: str) -> Optional[dict]:
         return None
 
 
-def verify_access_token(token: str) -> Optional[dict]:
-    """Verify JWT access token specifically"""
-    try:
-        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        if payload.get("type") != "access":
-            return None
-        return payload
-    except JWTError:
-        return None
+def create_refresh_token() -> str:
+    """Create a secure refresh token"""
+    return secrets.token_urlsafe(32)
 
 
-def verify_refresh_token(token: str) -> Optional[dict]:
-    """Verify JWT refresh token specifically"""
-    try:
-        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        if payload.get("type") != "refresh":
-            return None
-        return payload
-    except JWTError:
-        return None
+def create_refresh_token_expiry() -> datetime:
+    """Create refresh token expiry datetime"""
+    return datetime.utcnow() + timedelta(days=settings.refresh_token_expire_days)
+
+
+def is_refresh_token_expired(expires_at: datetime) -> bool:
+    """Check if refresh token is expired"""
+    return datetime.utcnow() > expires_at

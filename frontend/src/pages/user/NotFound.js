@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { FaHome } from 'react-icons/fa';
 import Button from '../../components/ui/Button';
 
 const NotFoundContainer = styled.div`
@@ -119,7 +120,7 @@ const NotFound = () => {
           animate={{ scale: 1, rotate: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          🏠
+          <FaHome />
         </Illustration>
 
         <ErrorCode

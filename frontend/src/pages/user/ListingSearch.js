@@ -1,587 +1,877 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
-import { motion } from 'framer-motion';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import Card from '../../components/ui/Card';
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import {
+  FaMapMarkerAlt,
+  FaUsers,
+  FaHeart,
+  FaRegHeart,
+  FaHome,
+  FaSpinner,
+  FaFilter,
+  FaTimes,
+  FaWifi,
+  FaUtensils,
+  FaBath,
+  FaBuilding,
+  FaCar,
+  FaDumbbell,
+  FaSwimmingPool,
+  FaTshirt,
+  FaSnowflake,
+  FaFire,
+  FaCouch,
+  FaDog,
+  FaBan,
+  FaShieldAlt,
+} from "react-icons/fa";
+import UserHeader from "../../components/user/UserHeader";
+import SearchForm from "../../components/ui/SearchForm";
+import Pagination from "../../components/ui/Pagination";
+import { usePagination } from "../../hooks/usePagination";
+import { propertiesAPI, usersAPI } from "../../services/api";
+import {
+  PageContainer,
+  ContentContainer,
+  Section,
+  Card,
+  Button,
+  Input,
+  Grid,
+  ThemedComponentProvider,
+} from "../../components/ui/ThemeProvider";
 
-const SearchContainer = styled.div`
-  min-height: 100vh;
-  background-color: ${props => props.theme.colors.background};
+// Search-specific styled components using ONLY theme variables
+const SearchHeader = styled(Section)`
+  padding: 2rem 0;
+  background: ${(props) => props.theme.colors.surface};
+  border-bottom: 1px solid ${(props) => props.theme.colors.border};
 `;
 
-const Header = styled.header`
-  background-color: ${props => props.theme.colors.white};
-  border-bottom: 1px solid ${props => props.theme.colors.border};
-  padding: ${props => props.theme.spacing.lg} 0;
-  position: sticky;
-  top: 0;
-  z-index: ${props => props.theme.zIndex.sticky};
-`;
-
-const HeaderContent = styled.div`
-  max-width: 1200px;
+const StyledSearchForm = styled(SearchForm)`
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 0 ${props => props.theme.spacing.xl};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const Logo = styled(Link)`
-  font-size: ${props => props.theme.typography.fontSizes['2xl']};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
-  color: ${props => props.theme.colors.primary};
-  text-decoration: none;
-`;
-
-const SearchBar = styled.div`
-  background-color: ${props => props.theme.colors.white};
-  border-bottom: 1px solid ${props => props.theme.colors.border};
-  padding: ${props => props.theme.spacing.lg} 0;
-`;
-
-const SearchForm = styled.form`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 ${props => props.theme.spacing.xl};
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
-  gap: ${props => props.theme.spacing.md};
-  align-items: end;
-  
-  @media (max-width: ${props => props.theme.breakpoints.lg}) {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  @media (max-width: ${props => props.theme.breakpoints.md}) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const MainContent = styled.main`
   max-width: 1200px;
   margin: 0 auto;
-  padding: ${props => props.theme.spacing.xl};
+  padding: 2rem;
   display: grid;
   grid-template-columns: 300px 1fr;
-  gap: ${props => props.theme.spacing.xl};
-  
-  @media (max-width: ${props => props.theme.breakpoints.lg}) {
+  gap: 2rem;
+
+  @media (max-width: 1024px) {
     grid-template-columns: 1fr;
+    padding: 1rem;
   }
 `;
 
-const FiltersSidebar = styled.aside`
-  background-color: ${props => props.theme.colors.white};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: ${props => props.theme.spacing.xl};
+const FiltersSidebar = styled(Card)`
   height: fit-content;
   position: sticky;
-  top: 200px;
-  
-  @media (max-width: ${props => props.theme.breakpoints.lg}) {
-    position: static;
+  top: 2rem;
+  min-width: 280px;
+
+  @media (max-width: 1024px) {
     order: 2;
+    position: static;
+    min-width: unset;
   }
 `;
 
-const FilterSection = styled.div`
-  margin-bottom: ${props => props.theme.spacing.xl};
-  
+const FiltersTitle = styled.h2`
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: ${(props) => props.theme.colors.text};
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const FilterGroup = styled.div`
+  margin-bottom: 2rem;
+
   &:last-child {
     margin-bottom: 0;
   }
 `;
 
-const FilterTitle = styled.h3`
-  font-size: ${props => props.theme.typography.fontSizes.lg};
-  font-weight: ${props => props.theme.typography.fontWeights.semibold};
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.md};
+const FilterLabel = styled.label`
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: ${(props) => props.theme.colors.text};
+  font-size: 0.9rem;
+`;
+
+const PriceRange = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+`;
+
+const PriceInput = styled(Input)`
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+  font-size: 0.875rem;
+`;
+
+const PriceSeparator = styled.span`
+  color: ${(props) => props.theme.colors.textSecondary};
+  font-weight: 500;
 `;
 
 const CheckboxGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${props => props.theme.spacing.sm};
+  gap: 0.75rem;
 `;
 
-const CheckboxLabel = styled.label`
+const CheckboxItem = styled.label`
   display: flex;
   align-items: center;
-  gap: ${props => props.theme.spacing.sm};
+  gap: 0.5rem;
   cursor: pointer;
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  color: ${props => props.theme.colors.text};
-  
-  input {
-    width: auto;
+  font-size: 0.875rem;
+  color: ${(props) => props.theme.colors.text};
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: ${(props) => props.theme.colors.primary};
+  }
+
+  input[type="checkbox"] {
     margin: 0;
+    accent-color: ${(props) => props.theme.colors.primary};
   }
 `;
 
-const PriceRange = styled.div`
+const AmenityLabel = styled.span`
   display: flex;
-  gap: ${props => props.theme.spacing.sm};
   align-items: center;
+  gap: 0.5rem;
+
+  svg {
+    font-size: 0.875rem;
+    color: ${(props) => props.theme.colors.primary};
+  }
 `;
 
-const PriceInput = styled(Input)`
-  flex: 1;
+const ClearFilters = styled.button`
+  background: none;
+  border: none;
+  color: ${(props) => props.theme.colors.primary};
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: ${(props) => props.theme.colors.brown};
+  }
 `;
 
-const ResultsSection = styled.section``;
+const ListingsSection = styled.div`
+  @media (max-width: 1024px) {
+    order: 1;
+  }
+`;
 
-const ResultsHeader = styled.div`
+const ListingsHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${props => props.theme.spacing.xl};
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
 `;
 
 const ResultsCount = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
-  font-size: ${props => props.theme.typography.fontSizes.lg};
+  color: ${(props) => props.theme.colors.textSecondary};
+  font-size: 0.875rem;
+  margin: 0;
 `;
 
 const SortSelect = styled.select`
-  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.md};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius.md};
-  background-color: ${props => props.theme.colors.white};
-  color: ${props => props.theme.colors.text};
-  font-size: ${props => props.theme.typography.fontSizes.sm};
+  padding: 0.5rem 1rem;
+  border: 1px solid ${(props) => props.theme.colors.border};
+  border-radius: 0.5rem;
+  background-color: ${(props) => props.theme.colors.surface};
+  color: ${(props) => props.theme.colors.text};
+  font-size: 0.875rem;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: ${(props) => props.theme.colors.primary};
+    box-shadow: 0 0 0 3px ${(props) => props.theme.colors.primary}33;
+  }
 `;
 
-const ListingsGrid = styled.div`
-  display: grid;
+const ListingsGrid = styled(Grid)`
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: ${props => props.theme.spacing.xl};
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const ListingCard = styled(Card)`
   cursor: pointer;
-  transition: transform ${props => props.theme.transitions.normal};
-  
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+
   &:hover {
     transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: ${(props) => props.theme.colors.primary};
   }
 `;
 
 const ListingImage = styled.div`
   width: 100%;
   height: 200px;
-  background-color: ${props => props.theme.colors.gray[200]};
-  border-radius: ${props => props.theme.borderRadius.md};
-  margin-bottom: ${props => props.theme.spacing.lg};
+  background: ${(props) =>
+    props.image
+      ? `url(${props.image})`
+      : `linear-gradient(135deg, ${props.theme.colors.primary} 0%, ${props.theme.colors.secondary} 100%)`};
+  background-size: cover;
+  background-position: center;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${props => props.theme.colors.gray[500]};
-  font-size: ${props => props.theme.typography.fontSizes['2xl']};
+  color: ${(props) => props.theme.colors.surface};
+  font-size: 2rem;
+  position: relative;
+  overflow: hidden;
+`;
+
+const FavoriteButton = styled.button`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  background-color: ${(props) => props.theme.colors.surface};
+  border: 1px solid ${(props) => props.theme.colors.border};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background-color: ${(props) => props.theme.colors.primary};
+    transform: scale(1.1);
+    border-color: ${(props) => props.theme.colors.primary};
+  }
+
+  .heart-icon {
+    color: ${(props) =>
+      props.isFavorited
+        ? props.theme.colors.primary
+        : props.theme.colors.textSecondary};
+    font-size: 1rem;
+    transition: color 0.2s ease;
+  }
+
+  &:hover .heart-icon {
+    color: ${(props) => props.theme.colors.surface};
+  }
+`;
+
+const ListingContent = styled.div`
+  padding: 0 0.5rem;
 `;
 
 const ListingTitle = styled.h3`
-  font-size: ${props => props.theme.typography.fontSizes.lg};
-  font-weight: ${props => props.theme.typography.fontWeights.semibold};
-  color: ${props => props.theme.colors.text};
-  margin-bottom: ${props => props.theme.spacing.sm};
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: ${(props) => props.theme.colors.text};
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
 `;
 
 const ListingLocation = styled.p`
-  color: ${props => props.theme.colors.textSecondary};
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  margin-bottom: ${props => props.theme.spacing.md};
+  color: ${(props) => props.theme.colors.textSecondary};
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 `;
 
 const ListingPrice = styled.div`
-  font-size: ${props => props.theme.typography.fontSizes.xl};
-  font-weight: ${props => props.theme.typography.fontWeights.bold};
-  color: ${props => props.theme.colors.primary};
-  margin-bottom: ${props => props.theme.spacing.md};
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: ${(props) => props.theme.colors.primary};
+  margin-bottom: 1rem;
+
+  .period {
+    font-size: 1rem;
+    font-weight: 400;
+    color: ${(props) => props.theme.colors.textSecondary};
+  }
 `;
 
 const ListingFeatures = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: ${props => props.theme.spacing.sm};
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 `;
 
-const Feature = styled.span`
-  background-color: ${props => props.theme.colors.surface};
-  color: ${props => props.theme.colors.textSecondary};
-  padding: ${props => props.theme.spacing.xs} ${props => props.theme.spacing.sm};
-  border-radius: ${props => props.theme.borderRadius.sm};
-  font-size: ${props => props.theme.typography.fontSizes.xs};
+const FeatureTag = styled.span`
+  background: ${(props) => props.theme.colors.accent};
+  color: ${(props) => props.theme.colors.surface};
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 `;
 
-const ClearFilters = styled.button`
-  background: none;
-  border: none;
-  color: ${props => props.theme.colors.primary};
-  font-size: ${props => props.theme.typography.fontSizes.sm};
-  cursor: pointer;
-  text-decoration: underline;
-  margin-top: ${props => props.theme.spacing.md};
-  
-  &:hover {
-    color: ${props => props.theme.colors.primaryDark};
+const ListingAmenities = styled.div`
+  display: flex;
+  gap: 1rem;
+  color: ${(props) => props.theme.colors.textSecondary};
+  font-size: 0.875rem;
+`;
+
+const AmenityItem = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  color: ${(props) => props.theme.colors.textSecondary};
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 3rem 2rem;
+  color: ${(props) => props.theme.colors.textSecondary};
+
+  h3 {
+    color: ${(props) => props.theme.colors.text};
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin-bottom: 2rem;
+  }
+`;
+
+const MobileFilterButton = styled(Button)`
+  display: none;
+
+  @media (max-width: 1024px) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
   }
 `;
 
 const ListingSearch = () => {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [favorites, setFavorites] = useState(new Set());
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Pagination configuration
+  const ITEMS_PER_PAGE = 12;
+
+  // Pagination hook for client-side pagination
+  const {
+    currentItems: paginatedListings,
+    currentPage,
+    totalPages,
+    totalItems,
+    goToPage,
+  } = usePagination(listings, ITEMS_PER_PAGE);
+
+  // Search filters state
   const [filters, setFilters] = useState({
-    location: '',
-    minPrice: '',
-    maxPrice: '',
-    furnished: false,
-    privateBathroom: false,
-    parking: false,
-    petFriendly: false,
-    gym: false,
-    wifi: false,
+    location: searchParams.get("location") || "",
+    checkIn: searchParams.get("check_in") || "",
+    checkOut: searchParams.get("check_out") || "",
+    minPrice: searchParams.get("min_price") || "",
+    maxPrice: searchParams.get("max_price") || "",
+    propertyType: searchParams.get("property_type") || "",
+    amenities: {
+      wifi: searchParams.has("wifi"),
+      kitchen: searchParams.has("kitchen"),
+      privateBathroom: searchParams.has("private_bathroom"),
+      balcony: searchParams.has("balcony"),
+      parking: searchParams.has("parking"),
+      gym: searchParams.has("gym"),
+      pool: searchParams.has("pool"),
+      laundry: searchParams.has("laundry"),
+      airConditioning: searchParams.has("air_conditioning"),
+      heating: searchParams.has("heating"),
+      furnished: searchParams.has("furnished"),
+      petFriendly: searchParams.has("pet_friendly"),
+      noSmoking: searchParams.has("no_smoking"),
+      securitySystem: searchParams.has("security_system"),
+    },
   });
 
-  const [sortBy, setSortBy] = useState('relevance');
-  const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState("relevance");
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setListings(mockListings);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    fetchListings();
+    fetchFavorites();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
-  const handleFilterChange = (name, value) => {
-    setFilters(prev => ({
+  const fetchListings = async () => {
+    setLoading(true);
+    try {
+      const params = Object.fromEntries(searchParams);
+      const response = await propertiesAPI.search(params);
+      setListings(response);
+    } catch (error) {
+      console.error("Failed to fetch listings:", error);
+      toast.error("Failed to load listings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchFavorites = async () => {
+    try {
+      const response = await usersAPI.getFavorites();
+      console.log("Favorites response in search:", response);
+      // Handle both API response formats
+      const favoritesData =
+        response.favourites || response.favorites || response || [];
+      setFavorites(new Set(favoritesData.map((fav) => fav.id)));
+    } catch (error) {
+      console.error("Failed to fetch favorites:", error);
+    }
+  };
+
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({
       ...prev,
-      [name]: value,
+      [key]: value,
     }));
   };
 
-  const handleClearFilters = () => {
-    setFilters({
-      location: '',
-      minPrice: '',
-      maxPrice: '',
-      furnished: false,
-      privateBathroom: false,
-      parking: false,
-      petFriendly: false,
-      gym: false,
-      wifi: false,
-    });
+  const handleLocationChange = (e) => {
+    setFilters((prev) => ({
+      ...prev,
+      location: e.target.value,
+    }));
   };
 
-  const mockListings = [
-    {
-      id: 1,
-      title: 'Cozy Studio in Kigali City Center',
-      location: 'Kigali, Rwanda',
-      price: 120,
-      features: ['Furnished', 'Private Bath'],
-      image: '🏠',
-    },
-    {
-      id: 2,
-      title: 'Modern 2BR Apartment in Remera',
-      location: 'Remera, Kigali',
-      price: 280,
-      features: ['Parking', 'Gym'],
-      image: '🏢',
-    },
-    {
-      id: 3,
-      title: 'Charming Room in Kimihurura',
-      location: 'Kimihurura, Kigali',
-      price: 150,
-      features: ['Pet Friendly', 'WiFi'],
-      image: '🏘️',
-    },
-    {
-      id: 4,
-      title: 'Luxury Suite in Nyarutarama',
-      location: 'Nyarutarama, Kigali',
-      price: 450,
-      features: ['Furnished', 'Parking', 'Gym'],
-      image: '🏙️',
-    },
-    {
-      id: 5,
-      title: 'Student-Friendly Room Near University',
-      location: 'Kacyiru, Kigali',
-      price: 90,
-      features: ['WiFi', 'Study Area'],
-      image: '🎓',
-    },
-    {
-      id: 6,
-      title: 'Family Home Room in Gisozi',
-      location: 'Gisozi, Kigali',
-      price: 130,
-      features: ['Pet Friendly', 'Garden'],
-      image: '🏡',
-    },
-    {
-      id: 7,
-      title: 'Studio Apartment in Kiyovu',
-      location: 'Kiyovu, Kigali',
-      price: 200,
-      features: ['Furnished', 'Balcony'],
-      image: '🏠',
-    },
-    {
-      id: 8,
-      title: 'Shared Room in Kabeza',
-      location: 'Kabeza, Kigali',
-      price: 75,
-      features: ['WiFi', 'Kitchen'],
-      image: '🏘️',
-    },
-    {
-      id: 9,
-      title: 'Luxury Apartment in Kigali Heights',
-      location: 'Kigali Heights, Rwanda',
-      price: 380,
-      features: ['Furnished', 'Pool', 'Security'],
-      image: '🏢',
-    },
-    {
-      id: 10,
-      title: 'Budget Room in Nyamirambo',
-      location: 'Nyamirambo, Kigali',
-      price: 60,
-      features: ['WiFi', 'Shared Kitchen'],
-      image: '🏠',
-    },
-    {
-      id: 11,
-      title: 'Premium Studio in Kigali Business District',
-      location: 'Kigali Business District',
-      price: 320,
-      features: ['Furnished', 'Gym', 'Parking'],
-      image: '🏢',
-    },
-    {
-      id: 12,
-      title: 'Cozy Room in Gikondo',
-      location: 'Gikondo, Kigali',
-      price: 85,
-      features: ['WiFi', 'Garden View'],
-      image: '🏡',
-    },
-  ];
+  const handleCheckInChange = (e) => {
+    setFilters((prev) => ({
+      ...prev,
+      checkIn: e.target.value,
+    }));
+  };
 
-  const filteredListings = listings.filter(listing => {
-    // Location filter
-    if (filters.location && !listing.location.toLowerCase().includes(filters.location.toLowerCase())) {
-      return false;
-    }
-    
-    // Price filters
-    if (filters.minPrice && listing.price < parseInt(filters.minPrice)) {
-      return false;
-    }
-    if (filters.maxPrice && listing.price > parseInt(filters.maxPrice)) {
-      return false;
-    }
-    
-    // Feature filters
-    if (filters.furnished && !listing.features.some(f => f.toLowerCase().includes('furnished'))) {
-      return false;
-    }
-    if (filters.privateBathroom && !listing.features.some(f => f.toLowerCase().includes('private') || f.toLowerCase().includes('bath'))) {
-      return false;
-    }
-    if (filters.parking && !listing.features.some(f => f.toLowerCase().includes('parking'))) {
-      return false;
-    }
-    if (filters.petFriendly && !listing.features.some(f => f.toLowerCase().includes('pet'))) {
-      return false;
-    }
-    if (filters.gym && !listing.features.some(f => f.toLowerCase().includes('gym'))) {
-      return false;
-    }
-    if (filters.wifi && !listing.features.some(f => f.toLowerCase().includes('wifi'))) {
-      return false;
-    }
-    
-    return true;
-  });
+  const handleBudgetChange = (e) => {
+    setFilters((prev) => ({
+      ...prev,
+      maxPrice: e.target.value,
+    }));
+  };
 
-  const sortedListings = [...filteredListings].sort((a, b) => {
+  const handleAmenityChange = (amenity, checked) => {
+    setFilters((prev) => ({
+      ...prev,
+      amenities: {
+        ...prev.amenities,
+        [amenity]: checked,
+      },
+    }));
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    const newParams = new URLSearchParams();
+
+    // Add search parameters
+    if (filters.location.trim())
+      newParams.set("location", filters.location.trim());
+    if (filters.checkIn) newParams.set("check_in", filters.checkIn);
+    if (filters.checkOut) newParams.set("check_out", filters.checkOut);
+    if (filters.minPrice) newParams.set("min_price", filters.minPrice);
+    if (filters.maxPrice) newParams.set("max_price", filters.maxPrice);
+    if (filters.propertyType)
+      newParams.set("property_type", filters.propertyType);
+
+    // Add amenities (convert camelCase to snake_case for URL)
+    const amenityMap = {
+      wifi: "wifi",
+      kitchen: "kitchen",
+      privateBathroom: "private_bathroom",
+      balcony: "balcony",
+      parking: "parking",
+      gym: "gym",
+      pool: "pool",
+      laundry: "laundry",
+      airConditioning: "air_conditioning",
+      heating: "heating",
+      furnished: "furnished",
+      petFriendly: "pet_friendly",
+      noSmoking: "no_smoking",
+      securitySystem: "security_system",
+    };
+
+    Object.entries(filters.amenities).forEach(([amenity, checked]) => {
+      if (checked) {
+        const urlParam = amenityMap[amenity] || amenity;
+        newParams.set(urlParam, "true");
+      }
+    });
+
+    setSearchParams(newParams);
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      location: "",
+      checkIn: "",
+      checkOut: "",
+      minPrice: "",
+      maxPrice: "",
+      propertyType: "",
+      amenities: {
+        wifi: false,
+        parking: false,
+        kitchen: false,
+        laundry: false,
+        gym: false,
+        pool: false,
+      },
+    });
+    setSearchParams(new URLSearchParams());
+  };
+
+  const toggleFavorite = async (propertyId) => {
+    try {
+      if (favorites.has(propertyId)) {
+        await usersAPI.removeFromFavorites(propertyId);
+        setFavorites((prev) => {
+          const newFavorites = new Set(prev);
+          newFavorites.delete(propertyId);
+          return newFavorites;
+        });
+        toast.success("Removed from favorites");
+      } else {
+        await usersAPI.addToFavorites(propertyId);
+        setFavorites((prev) => new Set([...prev, propertyId]));
+        toast.success("Added to favorites");
+      }
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+      toast.error("Failed to update favorites");
+    }
+  };
+
+  const handleListingClick = (listingId) => {
+    navigate(`/user/listing/${listingId}`);
+  };
+
+  const sortedListings = [...paginatedListings].sort((a, b) => {
     switch (sortBy) {
-      case 'price-low':
-        return a.price - b.price;
-      case 'price-high':
-        return b.price - a.price;
-      case 'newest':
-        return b.id - a.id;
+      case "price_low":
+        return a.price_per_night - b.price_per_night;
+      case "price_high":
+        return b.price_per_night - a.price_per_night;
+      case "newest":
+        return new Date(b.created_at) - new Date(a.created_at);
       default:
         return 0;
     }
   });
 
   return (
-    <SearchContainer>
-      <Header>
-        <HeaderContent>
-          <Logo to="/user">Wild Welcome</Logo>
-          <Button variant="outline" as={Link} to="/user/account">
-            My Account
-          </Button>
-        </HeaderContent>
-      </Header>
+    <ThemedComponentProvider>
+      <PageContainer>
+        <UserHeader />
 
-      <SearchBar>
-        <SearchForm>
-          <Input
-            label="Location"
-            placeholder="Enter city or neighborhood"
-            value={filters.location}
-            onChange={(e) => handleFilterChange('location', e.target.value)}
-          />
-          <Input
-            label="Min Price"
-            type="number"
-            placeholder="Min monthly rent"
-            value={filters.minPrice}
-            onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-          />
-          <Input
-            label="Max Price"
-            type="number"
-            placeholder="Max monthly rent"
-            value={filters.maxPrice}
-            onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-          />
-          <Button type="submit" size="lg">
-            Search
-          </Button>
-        </SearchForm>
-      </SearchBar>
+        {/* Search Header */}
+        <SearchHeader>
+          <ContentContainer>
+            <StyledSearchForm
+              location={filters.location}
+              checkIn={filters.checkIn}
+              budget={filters.maxPrice}
+              onLocationChange={handleLocationChange}
+              onCheckInChange={handleCheckInChange}
+              onBudgetChange={handleBudgetChange}
+              onSubmit={handleSearch}
+              locationPlaceholder="Where do you want to stay?"
+              budgetPlaceholder="Max price"
+              showIcon={true}
+            />
+          </ContentContainer>
+        </SearchHeader>
 
-      <MainContent>
-        <FiltersSidebar>
-          <FilterSection>
-            <FilterTitle>Price Range</FilterTitle>
-            <PriceRange>
-              <PriceInput
-                placeholder="Min"
-                value={filters.minPrice}
-                onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-              />
-              <span>-</span>
-              <PriceInput
-                placeholder="Max"
-                value={filters.maxPrice}
-                onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-              />
-            </PriceRange>
-          </FilterSection>
+        {/* Main Content */}
+        <MainContent>
+          {/* Filters Sidebar */}
+          <FiltersSidebar>
+            <FiltersTitle>
+              <FaFilter />
+              Filters
+            </FiltersTitle>
 
-          <FilterSection>
-            <FilterTitle>Amenities</FilterTitle>
-            <CheckboxGroup>
-              <CheckboxLabel>
-                <input
-                  type="checkbox"
-                  checked={filters.furnished}
-                  onChange={(e) => handleFilterChange('furnished', e.target.checked)}
+            {/* Price Range */}
+            <FilterGroup>
+              <FilterLabel>Price Range (per night)</FilterLabel>
+              <PriceRange>
+                <PriceInput
+                  type="number"
+                  placeholder="Min"
+                  value={filters.minPrice}
+                  onChange={(e) =>
+                    handleFilterChange("minPrice", e.target.value)
+                  }
+                  min="0"
                 />
-                Furnished
-              </CheckboxLabel>
-              <CheckboxLabel>
-                <input
-                  type="checkbox"
-                  checked={filters.privateBathroom}
-                  onChange={(e) => handleFilterChange('privateBathroom', e.target.checked)}
+                <PriceSeparator>—</PriceSeparator>
+                <PriceInput
+                  type="number"
+                  placeholder="Max"
+                  value={filters.maxPrice}
+                  onChange={(e) =>
+                    handleFilterChange("maxPrice", e.target.value)
+                  }
+                  min="0"
                 />
-                Private Bathroom
-              </CheckboxLabel>
-              <CheckboxLabel>
-                <input
-                  type="checkbox"
-                  checked={filters.parking}
-                  onChange={(e) => handleFilterChange('parking', e.target.checked)}
-                />
-                Parking
-              </CheckboxLabel>
-              <CheckboxLabel>
-                <input
-                  type="checkbox"
-                  checked={filters.petFriendly}
-                  onChange={(e) => handleFilterChange('petFriendly', e.target.checked)}
-                />
-                Pet Friendly
-              </CheckboxLabel>
-              <CheckboxLabel>
-                <input
-                  type="checkbox"
-                  checked={filters.gym}
-                  onChange={(e) => handleFilterChange('gym', e.target.checked)}
-                />
-                Gym Access
-              </CheckboxLabel>
-              <CheckboxLabel>
-                <input
-                  type="checkbox"
-                  checked={filters.wifi}
-                  onChange={(e) => handleFilterChange('wifi', e.target.checked)}
-                />
-                WiFi Included
-              </CheckboxLabel>
-            </CheckboxGroup>
-          </FilterSection>
+              </PriceRange>
+            </FilterGroup>
 
-          <ClearFilters onClick={handleClearFilters}>
-            Clear All Filters
-          </ClearFilters>
-        </FiltersSidebar>
-
-        <ResultsSection>
-          <ResultsHeader>
-            <ResultsCount>
-              {sortedListings.length} listings found
-            </ResultsCount>
-            <SortSelect value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              <option value="relevance">Sort by Relevance</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="newest">Newest First</option>
-            </SortSelect>
-          </ResultsHeader>
-
-          <ListingsGrid>
-            {sortedListings.map((listing, index) => (
-              <motion.div
-                key={listing.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+            {/* Property Type */}
+            <FilterGroup>
+              <FilterLabel>Property Type</FilterLabel>
+              <SortSelect
+                value={filters.propertyType}
+                onChange={(e) =>
+                  handleFilterChange("propertyType", e.target.value)
+                }
               >
-                <ListingCard as={Link} to={`/user/listing/${listing.id}`}>
-                  <ListingImage>{listing.image}</ListingImage>
-                  <ListingTitle>{listing.title}</ListingTitle>
-                  <ListingLocation>{listing.location}</ListingLocation>
-                  <ListingPrice>${listing.price}/month</ListingPrice>
-                  <ListingFeatures>
-                    {listing.features.map((feature, i) => (
-                      <Feature key={i}>{feature}</Feature>
-                    ))}
-                  </ListingFeatures>
-                </ListingCard>
-              </motion.div>
-            ))}
-          </ListingsGrid>
-        </ResultsSection>
-      </MainContent>
-    </SearchContainer>
+                <option value="">All Types</option>
+                <option value="apartment">Apartment</option>
+                <option value="house">House</option>
+                <option value="room">Room</option>
+                <option value="studio">Studio</option>
+              </SortSelect>
+            </FilterGroup>
+
+            {/* Amenities */}
+            <FilterGroup>
+              <FilterLabel>Amenities</FilterLabel>
+              <CheckboxGroup>
+                {Object.entries({
+                  wifi: { label: "WiFi", icon: <FaWifi /> },
+                  kitchen: { label: "Kitchen", icon: <FaUtensils /> },
+                  privateBathroom: {
+                    label: "Private Bathroom",
+                    icon: <FaBath />,
+                  },
+                  balcony: { label: "Balcony", icon: <FaBuilding /> },
+                  parking: { label: "Parking", icon: <FaCar /> },
+                  gym: { label: "Gym", icon: <FaDumbbell /> },
+                  pool: { label: "Pool", icon: <FaSwimmingPool /> },
+                  laundry: { label: "Laundry", icon: <FaTshirt /> },
+                  airConditioning: {
+                    label: "Air Conditioning",
+                    icon: <FaSnowflake />,
+                  },
+                  heating: { label: "Heating", icon: <FaFire /> },
+                  furnished: { label: "Furnished", icon: <FaCouch /> },
+                  petFriendly: { label: "Pet Friendly", icon: <FaDog /> },
+                  noSmoking: { label: "No Smoking", icon: <FaBan /> },
+                  securitySystem: {
+                    label: "Security System",
+                    icon: <FaShieldAlt />,
+                  },
+                }).map(([key, config]) => (
+                  <CheckboxItem key={key}>
+                    <input
+                      type="checkbox"
+                      checked={filters.amenities[key]}
+                      onChange={(e) =>
+                        handleAmenityChange(key, e.target.checked)
+                      }
+                    />
+                    <AmenityLabel>
+                      {config.icon}
+                      {config.label}
+                    </AmenityLabel>
+                  </CheckboxItem>
+                ))}
+              </CheckboxGroup>
+            </FilterGroup>
+
+            <ClearFilters onClick={clearFilters}>
+              <FaTimes style={{ marginRight: "0.5rem" }} />
+              Clear all filters
+            </ClearFilters>
+          </FiltersSidebar>
+
+          {/* Listings Section */}
+          <ListingsSection>
+            <MobileFilterButton
+              variant="secondary"
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+            >
+              <FaFilter />
+              Filters
+            </MobileFilterButton>
+
+            <ListingsHeader>
+              <ResultsCount>
+                {totalItems} {totalItems === 1 ? "property" : "properties"}{" "}
+                found
+                {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
+              </ResultsCount>
+              <SortSelect
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="relevance">Sort by relevance</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+                <option value="newest">Newest First</option>
+              </SortSelect>
+            </ListingsHeader>
+
+            {loading ? (
+              <LoadingContainer>
+                <FaSpinner
+                  className="fa-spin"
+                  style={{ marginRight: "1rem" }}
+                />
+                Loading properties...
+              </LoadingContainer>
+            ) : listings.length > 0 ? (
+              <>
+                <ListingsGrid>
+                  {sortedListings.map((listing) => (
+                    <motion.div
+                      key={listing.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <ListingCard
+                        onClick={() => handleListingClick(listing.id)}
+                      >
+                        <ListingImage image={listing.images?.[0]}>
+                          {!listing.images?.[0] && <FaHome />}
+                          <FavoriteButton
+                            isFavorited={favorites.has(listing.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFavorite(listing.id);
+                            }}
+                          >
+                            {favorites.has(listing.id) ? (
+                              <FaHeart className="heart-icon" />
+                            ) : (
+                              <FaRegHeart className="heart-icon" />
+                            )}
+                          </FavoriteButton>
+                        </ListingImage>
+
+                        <ListingContent>
+                          <ListingTitle>{listing.title}</ListingTitle>
+                          <ListingLocation>
+                            <FaMapMarkerAlt />
+                            {listing.location?.address ||
+                              listing.location?.city ||
+                              "Location not specified"}
+                          </ListingLocation>
+                          <ListingPrice>
+                            ${listing.price_per_night}
+                            <span className="period">/night</span>
+                          </ListingPrice>
+
+                          <ListingFeatures>
+                            <FeatureTag>{listing.property_type}</FeatureTag>
+                            <FeatureTag>
+                              <FaUsers />
+                              {listing.max_guests} guests
+                            </FeatureTag>
+                          </ListingFeatures>
+
+                          <ListingAmenities>
+                            {listing.amenities?.wifi && (
+                              <AmenityItem>WiFi</AmenityItem>
+                            )}
+                            {listing.amenities?.parking && (
+                              <AmenityItem>Parking</AmenityItem>
+                            )}
+                            {listing.amenities?.kitchen && (
+                              <AmenityItem>Kitchen</AmenityItem>
+                            )}
+                          </ListingAmenities>
+                        </ListingContent>
+                      </ListingCard>
+                    </motion.div>
+                  ))}
+                </ListingsGrid>
+
+                {/* Pagination Component */}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  itemsPerPage={ITEMS_PER_PAGE}
+                  onPageChange={goToPage}
+                  showInfo={true}
+                />
+              </>
+            ) : (
+              <EmptyState>
+                <h3>No properties found</h3>
+                <p>
+                  Try adjusting your search criteria or filters to find more
+                  results.
+                </p>
+                <Button variant="primary" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+              </EmptyState>
+            )}
+          </ListingsSection>
+        </MainContent>
+      </PageContainer>
+    </ThemedComponentProvider>
   );
 };
 
-export default ListingSearch; 
+export default ListingSearch;

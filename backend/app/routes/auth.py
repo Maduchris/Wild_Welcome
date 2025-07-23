@@ -1,25 +1,30 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.database.mongodb import get_database
-from app.models.user import UserCreate, UserLogin, User, Token, UserInDB, TokenRefresh
-from app.auth.jwt import verify_password, get_password_hash, create_access_token, create_refresh_token, verify_token
+from app.models.user import UserCreate, UserLogin, User, Token, UserInDB
+from pydantic import BaseModel
+from app.auth.jwt import verify_password, get_password_hash, create_access_token, verify_token, create_refresh_token, create_refresh_token_expiry, is_refresh_token_expired
 from app.auth.dependencies import get_current_user
-from app.auth.rate_limiter import check_login_rate_limit, check_register_rate_limit, check_password_reset_rate_limit
 from app.services.email_service import email_service
 from datetime import timedelta
 from app.core.config import settings
 from bson import ObjectId
 from datetime import datetime
+from google.auth.transport import requests
+from google.oauth2 import id_token
+import logging
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
 
 
 @router.post("/register", response_model=dict)
 async def register(user: UserCreate, db = Depends(get_database)):
     """Register a new user"""
-    # Check rate limit
-    await check_register_rate_limit(user.email)
-    
     # Check if user already exists
     existing_user = await db.users.find_one({"email": user.email})
     if existing_user:
@@ -61,25 +66,12 @@ async def register(user: UserCreate, db = Depends(get_database)):
 @router.post("/login", response_model=Token)
 async def login(user_credentials: UserLogin, db = Depends(get_database)):
     """Login user"""
-    print("[DEBUG] Login attempt for:", user_credentials.email)
-    # Check rate limit
-    await check_login_rate_limit(user_credentials.email)
-    
     # Find user
     user = await db.users.find_one({"email": user_credentials.email})
-    print("[DEBUG] User found:", user)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Check if user is active
-    if not user.get("is_active", True):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Account is deactivated",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
@@ -91,81 +83,32 @@ async def login(user_credentials: UserLogin, db = Depends(get_database)):
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Create access token
+    # Create tokens
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
         data={"sub": user["email"]}, expires_delta=access_token_expires
     )
-    print("[DEBUG] Access token generated:", access_token[:20], "...")
     
-    # Create refresh token
-    refresh_token_expires = timedelta(days=settings.refresh_token_expire_days)
-    refresh_token = create_refresh_token(
-        data={"sub": user["email"]}, expires_delta=refresh_token_expires
+    refresh_token = create_refresh_token()
+    refresh_token_expiry = create_refresh_token_expiry()
+    
+    # Store refresh token in database
+    await db.users.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "refresh_token": refresh_token,
+                "refresh_token_expires_at": refresh_token_expiry,
+                "updated_at": datetime.utcnow()
+            }
+        }
     )
-    print("[DEBUG] Refresh token generated:", refresh_token[:20], "...")
     
     return {
-        "access_token": access_token, 
+        "access_token": access_token,
         "refresh_token": refresh_token,
         "token_type": "bearer"
     }
-
-
-@router.post("/refresh", response_model=Token)
-async def refresh_token(refresh_data: TokenRefresh, db = Depends(get_database)):
-    """Refresh access token using refresh token"""
-    try:
-        # Verify refresh token
-        payload = verify_token(refresh_data.refresh_token)
-        if not payload:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid refresh token",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        
-        email = payload.get("sub")
-        if not email:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid refresh token",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        
-        # Check if user still exists and is active
-        user = await db.users.find_one({"email": email})
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not found",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        
-        if not user.get("is_active", True):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Account is deactivated",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        
-        # Create new access token
-        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
-        access_token = create_access_token(
-            data={"sub": email}, expires_delta=access_token_expires
-        )
-        
-        return {
-            "access_token": access_token,
-            "token_type": "bearer"
-        }
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
 
 
 @router.post("/token", response_model=Token)
@@ -187,22 +130,138 @@ async def login_for_access_token(
         data={"sub": user["email"]}, expires_delta=access_token_expires
     )
     
-    return {"access_token": access_token, "token_type": "bearer"}
+    refresh_token = create_refresh_token()
+    refresh_token_expiry = create_refresh_token_expiry()
+    
+    # Store refresh token in database
+    await db.users.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "refresh_token": refresh_token,
+                "refresh_token_expires_at": refresh_token_expiry,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    }
+
+
+@router.post("/refresh", response_model=Token)
+async def refresh_access_token(refresh_token: str, db = Depends(get_database)):
+    """Refresh access token using refresh token"""
+    if not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token is required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Find user with this refresh token
+    user = await db.users.find_one({"refresh_token": refresh_token})
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Check if refresh token is expired
+    if not user.get("refresh_token_expires_at") or is_refresh_token_expired(user["refresh_token_expires_at"]):
+        # Clear expired refresh token
+        await db.users.update_one(
+            {"_id": user["_id"]},
+            {"$unset": {"refresh_token": "", "refresh_token_expires_at": ""}}
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Generate new tokens
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": user["email"]}, expires_delta=access_token_expires
+    )
+    
+    new_refresh_token = create_refresh_token()
+    new_refresh_token_expiry = create_refresh_token_expiry()
+    
+    # Update refresh token in database
+    await db.users.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "refresh_token": new_refresh_token,
+                "refresh_token_expires_at": new_refresh_token_expiry,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    return {
+        "access_token": access_token,
+        "refresh_token": new_refresh_token,
+        "token_type": "bearer"
+    }
 
 
 @router.get("/me", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_user)):
     """Get current user profile"""
-    print("[DEBUG] /me endpoint called. Current user:", current_user)
     return current_user
 
 
-@router.post("/logout")
-async def logout(current_user: User = Depends(get_current_user)):
-    """Logout user (optional - can be handled client-side)"""
-    # In a more advanced implementation, you could blacklist the token
-    # For now, we'll just return success
-    return {"message": "Logged out successfully"}
+@router.post("/change-password")
+async def change_password(
+    password_data: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db = Depends(get_database)
+):
+    """Change user password"""
+    # Get current user from database to verify current password
+    user_doc = await db.users.find_one({"email": current_user.email})
+    if not user_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Check if user has a password (Google users might not have one)
+    if not user_doc.get("hashed_password"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot change password for social login accounts"
+        )
+    
+    # Verify current password
+    if not verify_password(password_data.current_password, user_doc["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    # Hash new password
+    new_hashed_password = get_password_hash(password_data.new_password)
+    
+    # Update password in database
+    await db.users.update_one(
+        {"email": current_user.email},
+        {
+            "$set": {
+                "hashed_password": new_hashed_password,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    return {"message": "Password changed successfully"}
 
 
 @router.post("/forgot-password")
@@ -253,51 +312,138 @@ async def reset_password(token: str, new_password: str, db = Depends(get_databas
     return {"message": "Password reset successfully"}
 
 
-@router.post("/verify-email")
-async def verify_email(token: str, db = Depends(get_database)):
-    """Verify email address using token"""
-    # Verify token
-    payload = verify_token(token)
-    if not payload or payload.get("type") != "email_verification":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid or expired verification token"
+@router.post("/google", response_model=Token)
+async def google_login(token: dict, db = Depends(get_database)):
+    """Login with Google OAuth token"""
+    try:
+        # Verify the Google token
+        google_token = token.get("token")
+        if not google_token:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Google token is required"
+            )
+        
+        # Verify token with Google
+        try:
+            idinfo = id_token.verify_oauth2_token(
+                google_token, 
+                requests.Request(), 
+                settings.google_client_id if hasattr(settings, 'google_client_id') else None
+            )
+            
+            # Get user info from Google token
+            email = idinfo.get('email')
+            first_name = idinfo.get('given_name', '')
+            last_name = idinfo.get('family_name', '')
+            profile_image = idinfo.get('picture', '')
+            
+            if not email:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email not found in Google token"
+                )
+                
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid Google token"
+            )
+        
+        # Check if user exists
+        user = await db.users.find_one({"email": email})
+        
+        if not user:
+            # Create new user from Google info
+            user_data = {
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+                "phone": "",
+                "user_type": "user",
+                "profile_image": profile_image,
+                "is_active": True,
+                "is_verified": True,  # Google accounts are pre-verified
+                "hashed_password": "",  # No password for Google users
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            
+            result = await db.users.insert_one(user_data)
+            user = await db.users.find_one({"_id": result.inserted_id})
+            
+            # Send welcome email
+            await email_service.send_welcome_email(
+                email, 
+                f"{first_name} {last_name}"
+            )
+        
+        # Create tokens
+        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+        access_token = create_access_token(
+            data={"sub": user["email"]}, expires_delta=access_token_expires
         )
-    
-    email = payload.get("sub")
-    if not email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid token"
+        
+        refresh_token = create_refresh_token()
+        refresh_token_expiry = create_refresh_token_expiry()
+        
+        # Store refresh token in database
+        await db.users.update_one(
+            {"_id": user["_id"]},
+            {
+                "$set": {
+                    "refresh_token": refresh_token,
+                    "refresh_token_expires_at": refresh_token_expiry,
+                    "updated_at": datetime.utcnow()
+                }
+            }
         )
-    
-    # Update user verification status
-    await db.users.update_one(
-        {"email": email},
-        {"$set": {"is_verified": True, "updated_at": datetime.utcnow()}}
-    )
-    
-    return {"message": "Email verified successfully"}
+        
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer"
+        }
+        
+    except Exception as e:
+        logging.error(f"Google login error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Google login failed"
+        )
 
 
-@router.post("/resend-verification")
-async def resend_verification_email(email: str, db = Depends(get_database)):
-    """Resend email verification"""
-    user = await db.users.find_one({"email": email})
-    if not user:
-        # Don't reveal if email exists or not
-        return {"message": "If email exists, verification email has been sent"}
-    
-    if user.get("is_verified", False):
-        return {"message": "Email is already verified"}
-    
-    # Create verification token
-    verification_token = create_access_token(
-        data={"sub": user["email"], "type": "email_verification"},
-        expires_delta=timedelta(hours=24)
-    )
-    
-    # Send verification email
-    await email_service.send_verification_email(user["email"], verification_token)
-    
-    return {"message": "If email exists, verification email has been sent"}
+@router.get("/stats")
+async def get_platform_stats(db = Depends(get_database)):
+    """Get platform statistics"""
+    try:
+        # Count active properties
+        properties_count = await db.properties.count_documents({"is_active": True})
+        
+        # Count total users
+        users_count = await db.users.count_documents({"is_active": True})
+        
+        # Count landlords
+        landlords_count = await db.users.count_documents({
+            "user_type": "landlord", 
+            "is_active": True
+        })
+        
+        # Count completed bookings (as a proxy for happy tenants)
+        bookings_count = await db.bookings.count_documents({"status": "approved"})
+        
+        return {
+            "available_properties": properties_count,
+            "total_users": users_count,
+            "happy_tenants": bookings_count,
+            "trusted_landlords": landlords_count
+        }
+    except Exception as e:
+        logging.error(f"Stats error: {str(e)}")
+        # Return default stats if database query fails
+        return {
+            "available_properties": 0,
+            "total_users": 0,
+            "happy_tenants": 0,
+            "trusted_landlords": 0
+        }
