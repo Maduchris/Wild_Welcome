@@ -354,17 +354,17 @@ const ListingPage = () => {
           setIsFavorite(localFavorites.includes(id));
         }
 
-        // Fetch existing bookings for this property
+        // Fetch user's own bookings for this property (if any)
         try {
-          const bookings = await bookingsAPI.getLandlordApplications();
-          const propertyBookings = bookings.filter(
-            (booking) =>
-              booking.property_id === id &&
-              (booking.status === "approved" || booking.status === "pending")
+          const userBookings = await bookingsAPI.getUserBookings();
+          const userPropertyBookings = userBookings.filter(
+            (booking) => booking.property_id === id
           );
-          setExistingBookings(propertyBookings);
+          setExistingBookings(userPropertyBookings);
         } catch (error) {
-          console.error("Error fetching bookings:", error);
+          console.error("Error fetching user bookings:", error);
+          // Don't show error to user since this is optional data
+          setExistingBookings([]);
         }
       } catch (error) {
         console.error("Error fetching property:", error);

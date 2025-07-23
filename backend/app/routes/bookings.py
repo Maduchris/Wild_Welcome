@@ -8,6 +8,7 @@ from app.services.sms_service import sms_service
 from bson import ObjectId
 from datetime import datetime
 from typing import List, Optional
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
@@ -278,10 +279,13 @@ async def get_landlord_booking_requests(
     return booking_responses
 
 
+class BookingApprovalRequest(BaseModel):
+    message_data: Optional[dict] = None
+
 @router.post("/{booking_id}/approve")
 async def approve_booking(
     booking_id: str,
-    message_data: dict = None,
+    request: BookingApprovalRequest,
     current_user: User = Depends(get_current_landlord),
     db = Depends(get_database)
 ):
@@ -316,8 +320,8 @@ async def approve_booking(
     
     # Get response message if provided
     response_message = ""
-    if message_data and message_data.get("response_message"):
-        response_message = message_data.get("response_message")
+    if request.message_data and request.message_data.get("response_message"):
+        response_message = request.message_data.get("response_message")
     
     # Approve booking
     update_data = {
@@ -338,7 +342,7 @@ async def approve_booking(
 @router.post("/{booking_id}/reject")
 async def reject_booking(
     booking_id: str,
-    message_data: dict = None,
+    request: BookingApprovalRequest,
     current_user: User = Depends(get_current_landlord),
     db = Depends(get_database)
 ):
@@ -373,8 +377,8 @@ async def reject_booking(
     
     # Get response message if provided
     response_message = ""
-    if message_data and message_data.get("response_message"):
-        response_message = message_data.get("response_message")
+    if request.message_data and request.message_data.get("response_message"):
+        response_message = request.message_data.get("response_message")
     
     # Reject booking
     update_data = {
@@ -403,6 +407,11 @@ async def get_booking_with_details(booking_id: ObjectId, db) -> BookingResponse:
     # Get user details
     user_data = await db.users.find_one({"_id": booking["user_id"]})
     
+    # Get landlord details if property exists
+    landlord_data = None
+    if property_data and property_data.get("landlord_id"):
+        landlord_data = await db.users.find_one({"_id": property_data["landlord_id"]})
+    
     # Create response
     booking_response = BookingResponse(
         id=str(booking["_id"]),
@@ -419,7 +428,9 @@ async def get_booking_with_details(booking_id: ObjectId, db) -> BookingResponse:
         property_title=property_data["title"] if property_data else None,
         property_location=property_data["location"]["address"] if property_data else None,
         user_name=f"{user_data['first_name']} {user_data['last_name']}" if user_data else None,
-        user_email=user_data["email"] if user_data else None
+        user_email=user_data["email"] if user_data else None,
+        landlord_name=f"{landlord_data['first_name']} {landlord_data['last_name']}" if landlord_data else None,
+        landlord_email=landlord_data["email"] if landlord_data else None
     )
     
     return booking_response

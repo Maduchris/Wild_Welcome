@@ -1,0 +1,46 @@
+services:
+  # Backend API Service
+  - type: web
+    name: wild-welcome-api
+    env: python
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: MONGODB_URL
+        fromDatabase:
+          name: wild-welcome-db
+          property: connectionString
+      - key: DATABASE_NAME
+        value: wild_welcome
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: wild-welcome-frontend
+          property: host
+
+  # Frontend React App
+  - type: web
+    name: wild-welcome-frontend
+    env: static
+    buildCommand: "cd frontend && npm ci && npm run build"
+    staticPublishPath: frontend/build
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: wild-welcome-api
+          property: host
+
+databases:
+  - name: wild-welcome-db
+    databaseName: wild_welcome
+    user: admin

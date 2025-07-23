@@ -15,6 +15,11 @@ services:
       - mongodb_data:/data/db
     networks:
       - wild_welcome_network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/wild_welcome --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   backend:
     build: .
@@ -23,14 +28,39 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     environment:
       - MONGODB_URL=mongodb://admin:password@mongodb:27017/wild_welcome?authSource=admin
       - DATABASE_NAME=wild_welcome
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRE_MINUTES=1440
+      - ENVIRONMENT=production
     env_file:
       - .env
     volumes:
       - .:/app
+    networks:
+      - wild_welcome_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build: ../frontend
+    container_name: wild_welcome_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api
+      - REACT_APP_ENVIRONMENT=production
     networks:
       - wild_welcome_network
 

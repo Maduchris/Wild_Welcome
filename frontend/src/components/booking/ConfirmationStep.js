@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   FaCheckCircle,
   FaHome,
@@ -184,8 +185,11 @@ const ActionButtons = styled.div`
 `;
 
 const ConfirmationStep = () => {
-  // Generate a mock application ID
-  const applicationId = `WW-${Date.now().toString(36).toUpperCase()}`;
+  const navigate = useNavigate();
+  
+  // Get the actual booking ID from localStorage (set by BookingFlow)
+  const bookingId = localStorage.getItem('lastBookingId');
+  const applicationId = bookingId ? bookingId : `WW-${Date.now().toString(36).toUpperCase()}`;
 
   const handleDownloadConfirmation = () => {
     // In a real app, this would generate and download a PDF
@@ -194,13 +198,13 @@ const ConfirmationStep = () => {
   };
 
   const handleGoToDashboard = () => {
-    // Navigate to user dashboard
-    window.location.href = "/user/dashboard";
+    // Navigate to user dashboard using React Router
+    navigate("/user/dashboard");
   };
 
   const handleViewApplications = () => {
-    // Navigate to applications page
-    window.location.href = "/user/applications";
+    // Navigate to applications page using React Router
+    navigate("/user/applications");
   };
 
   return (

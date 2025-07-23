@@ -8,15 +8,8 @@ import {
   FaCheckCircle,
   FaUsers,
   FaTools,
-  FaEdit,
-  FaEye,
-  FaTrash,
   FaPlus,
   FaFilter,
-  FaBed,
-  FaBath,
-  FaRulerCombined,
-  FaMapMarkerAlt,
 } from "react-icons/fa";
 import { propertiesAPI } from "../../services/api";
 import { PROPERTY_TYPES, PROPERTY_STATUS } from "../../constants/propertyEnums";
@@ -33,12 +26,6 @@ import {
   EmptyState,
   StatCard as ReusableStatCard,
   StatsGrid as ReusableStatsGrid,
-  StatNumber,
-  StatLabel,
-  // PropertyCard as ReusablePropertyCard,
-  ImageContainer,
-  Button as ReusableButton,
-  Input as ReusableInput,
 } from "../../components/ui/ThemeProvider";
 import ListingCard from "../../components/ui/ListingCard";
 
@@ -187,25 +174,6 @@ const PropertiesGrid = styled.div`
   gap: ${(props) => props.theme.spacing.lg};
 `;
 
-const DetailItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${(props) => props.theme.spacing.xs};
-  font-size: ${(props) => props.theme.typography.fontSizes.sm};
-  color: ${(props) => props.theme.colors.textSecondary};
-`;
-
-const PropertyActions = styled.div`
-  display: flex;
-  gap: ${(props) => props.theme.spacing.sm};
-`;
-
-const ActionButton = styled(ReusableButton)`
-  flex: 1;
-  font-size: ${(props) => props.theme.typography.fontSizes.sm};
-  padding: ${(props) => props.theme.spacing.sm};
-`;
-
 const AddPropertyButton = styled(Button)`
   display: flex;
   align-items: center;
@@ -327,34 +295,6 @@ const LandlordPropertyManagement = () => {
       ...prev,
       [name]: value,
     }));
-  };
-
-  const handleDeleteProperty = async (propertyId) => {
-    if (!window.confirm("Are you sure you want to delete this property?")) {
-      return;
-    }
-
-    try {
-      await propertiesAPI.delete(propertyId);
-      const updatedProperties = properties.filter((p) => p.id !== propertyId);
-      setProperties(updatedProperties);
-
-      // Update stats after deletion
-      const total = updatedProperties.length;
-      const available = updatedProperties.filter((p) => p.is_active).length;
-      const occupied = updatedProperties.filter(
-        (p) => !p.is_active && p.status !== "maintenance"
-      ).length;
-      const maintenance = updatedProperties.filter(
-        (p) => p.status === "maintenance"
-      ).length;
-      setStats({ total, available, occupied, maintenance });
-
-      toast.success("Property deleted successfully");
-    } catch (error) {
-      console.error("Error deleting property:", error);
-      toast.error("Failed to delete property");
-    }
   };
 
   const statsConfig = [

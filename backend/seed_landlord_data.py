@@ -15,7 +15,7 @@ from bson import ObjectId
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 
-from app.database.mongodb import get_database
+from app.database.mongodb import get_database, connect_to_mongo
 from app.models.user import User
 from app.models.property import Property
 from app.models.booking import Booking
@@ -626,6 +626,7 @@ async def main():
     print("="*60)
     
     # Connect to database
+    await connect_to_mongo()
     db = await get_database()
     
     try:

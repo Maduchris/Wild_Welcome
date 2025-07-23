@@ -6,7 +6,7 @@ from app.models.user import PyObjectId
 
 
 class BookingBase(BaseModel):
-    property_id: PyObjectId
+    property_id: str
     check_in: datetime
     check_out: datetime
     guests: int = Field(..., ge=1)
@@ -70,3 +70,5 @@ class BookingResponse(BaseModel):
     property_location: Optional[str] = None
     user_name: Optional[str] = None
     user_email: Optional[str] = None
+    landlord_name: Optional[str] = None
+    landlord_email: Optional[str] = None

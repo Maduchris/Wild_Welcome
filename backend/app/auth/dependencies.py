@@ -23,18 +23,22 @@ async def get_current_user(
     try:
         payload = verify_token(credentials.credentials)
         if payload is None:
+            print("Token verification failed: invalid signature or expired")
             raise credentials_exception
             
         email: str = payload.get("sub")
         if email is None:
+            print("Token payload missing 'sub' field")
             raise credentials_exception
             
-    except Exception:
+    except Exception as e:
+        print(f"Token validation error: {e}")
         raise credentials_exception
     
     # Get user from database
     user_data = await db.users.find_one({"email": email})
     if user_data is None:
+        print(f"User not found for email: {email}")
         raise credentials_exception
     
     # Convert ObjectId to string for the User model

@@ -173,12 +173,21 @@ export const authAPI = {
     try {
       const response = await api.post('/auth/google', { token });
       if (response.data.access_token) {
-        localStorage.setItem('access_token', response.data.access_token);
+        // Store with consistent naming
+        localStorage.setItem('token', response.data.access_token);
         
         // Store refresh token if provided
         if (response.data.refresh_token) {
           localStorage.setItem('refresh_token', response.data.refresh_token);
         }
+        
+        // Store session metadata
+        const sessionData = {
+          loginTime: Date.now(),
+          tokenExpiry: null,
+          lastActivity: Date.now()
+        };
+        localStorage.setItem('session_data', JSON.stringify(sessionData));
         
         const userResponse = await api.get('/auth/me');
         localStorage.setItem('user', JSON.stringify(userResponse.data));
@@ -379,6 +388,15 @@ export const bookingsAPI = {
     }
   },
 
+  getById: async (bookingId) => {
+    try {
+      const response = await api.get(`/bookings/${bookingId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
   getUserBookings: async () => {
     try {
       const response = await api.get('/bookings');
@@ -399,7 +417,9 @@ export const bookingsAPI = {
 
   approve: async (bookingId, message = '') => {
     try {
-      const response = await api.post(`/bookings/${bookingId}/approve`, { response_message: message });
+      const response = await api.post(`/bookings/${bookingId}/approve`, { 
+        message_data: { response_message: message } 
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -408,7 +428,9 @@ export const bookingsAPI = {
 
   reject: async (bookingId, message = '') => {
     try {
-      const response = await api.post(`/bookings/${bookingId}/reject`, { response_message: message });
+      const response = await api.post(`/bookings/${bookingId}/reject`, { 
+        message_data: { response_message: message } 
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -613,21 +635,37 @@ export const getCurrentUser = () => {
 };
 
 export const isAuthenticated = () => {
-  const hasToken = !!getAuthToken();
+  const token = getAuthToken();
   const sessionValid = isSessionValid();
   
-  if (hasToken && !sessionValid) {
+  if (!token) return false;
+  
+  if (!sessionValid) {
     // Session expired, clear data
-    authAPI.logout();
+    logout();
+    return false;
+  }
+  
+  // Validate JWT token structure and expiration
+  try {
+    const tokenData = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Date.now() / 1000;
+    
+    // Check if token is expired
+    if (tokenData.exp && tokenData.exp < currentTime) {
+      console.log('JWT token expired, logging out');
+      logout();
+      return false;
+    }
+  } catch (error) {
+    console.error('Invalid JWT token:', error);
+    logout();
     return false;
   }
   
   // Update activity if authenticated
-  if (hasToken && sessionValid) {
-    updateLastActivity();
-  }
-  
-  return hasToken && sessionValid;
+  updateLastActivity();
+  return true;
 };
 
 export const isLandlord = () => {

@@ -746,14 +746,16 @@ const LandlordBookingRequest = () => {
                         {request.status === "pending" && (
                           <>
                             <ActionButton
+                              as={Link}
+                              to={`/landlord/approve/${request.id}`}
                               className="approve-button"
-                              onClick={() => handleApprove(request.id)}
                             >
                               Approve
                             </ActionButton>
                             <ActionButton
+                              as={Link}
+                              to={`/landlord/reject/${request.id}`}
                               className="reject-button"
-                              onClick={() => handleReject(request.id)}
                             >
                               Reject
                             </ActionButton>

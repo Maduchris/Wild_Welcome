@@ -19,7 +19,7 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import UserHeader from '../../components/user/UserHeader';
 import { ThemedComponentProvider } from '../../components/ui/ThemeProvider';
-import { bookingsAPI } from '../../services/api';
+import { bookingsAPI, getCurrentUser } from '../../services/api';
 
 const ApplicationsContainer = styled.div`
   min-height: 100vh;
@@ -250,11 +250,17 @@ const UserRoomApplications = () => {
     const fetchApplications = async () => {
       try {
         setLoading(true);
+        console.log('Fetching user bookings...');
+        console.log('Current user:', getCurrentUser());
+        
         const data = await bookingsAPI.getUserBookings();
         console.log('User applications data:', data);
+        console.log('Number of applications:', data?.length || 0);
+        
         setApplications(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching applications:', error);
+        console.error('Error details:', error.response?.data);
         toast.error('Failed to load your applications');
         setApplications([]);
       } finally {
@@ -448,8 +454,8 @@ const UserRoomApplications = () => {
                       <div>
                         <div className="label">Check-in Date</div>
                         <div className="value">
-                          {application.check_in_date 
-                            ? new Date(application.check_in_date).toLocaleDateString()
+                          {application.check_in 
+                            ? new Date(application.check_in).toLocaleDateString()
                             : 'N/A'
                           }
                         </div>
@@ -459,9 +465,9 @@ const UserRoomApplications = () => {
                     <DetailItem>
                       <FaDollarSign className="icon" />
                       <div>
-                        <div className="label">Total Amount</div>
+                        <div className="label">Total Price</div>
                         <div className="value">
-                          ${application.total_amount || application.rent || 'N/A'}
+                          ${application.total_price || 'N/A'}
                         </div>
                       </div>
                     </DetailItem>
@@ -471,7 +477,7 @@ const UserRoomApplications = () => {
                       <div>
                         <div className="label">Landlord</div>
                         <div className="value">
-                          {application.landlord_name || application.landlord || 'N/A'}
+                          {application.landlord_name || 'N/A'}
                         </div>
                       </div>
                     </DetailItem>

@@ -1,0 +1,38 @@
+# Docker Compose for Wild Welcome Staging Deployment
+# Uses existing MongoDB connection from .env file
+
+services:
+  backend:
+    build: ./backend
+    container_name: wild_welcome_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    networks:
+      - wild_welcome_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build: ./frontend
+    container_name: wild_welcome_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api
+      - REACT_APP_ENVIRONMENT=production
+    networks:
+      - wild_welcome_network
+
+networks:
+  wild_welcome_network:
+    driver: bridge

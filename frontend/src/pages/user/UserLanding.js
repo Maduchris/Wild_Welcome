@@ -26,7 +26,7 @@ import {
   StatCard,
   StatNumber,
   StatLabel,
-  ImageContainer,
+  // ImageContainer,
   ThemedComponentProvider,
 } from "../../components/ui/ThemeProvider";
 import ListingCard from "../../components/ui/ListingCard";
@@ -100,36 +100,36 @@ const BannerContent = styled.div`
   }
 `;
 
-const PropertyCardContent = styled.div`
-  padding: 1.5rem;
-`;
+// const PropertyCardContent = styled.div`
+//   padding: 1.5rem;
+// `;
 
-const PropertyTitle = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: ${(props) => props.theme.colors.text};
-  margin-bottom: 0.5rem;
-`;
+// const PropertyTitle = styled.h3`
+//   font-size: 1.25rem;
+//   font-weight: 600;
+//   color: ${(props) => props.theme.colors.text};
+//   margin-bottom: 0.5rem;
+// `;
 
-const PropertyLocation = styled.p`
-  color: ${(props) => props.theme.colors.textSecondary};
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-`;
+// const PropertyLocation = styled.p`
+//   color: ${(props) => props.theme.colors.textSecondary};
+//   font-size: 0.875rem;
+//   margin-bottom: 1rem;
+// `;
 
-const PropertyPrice = styled.div`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: ${(props) => props.theme.colors.primary};
-  margin-bottom: 1rem;
-`;
+// const PropertyPrice = styled.div`
+//   font-size: 1.5rem;
+//   font-weight: 700;
+//   color: ${(props) => props.theme.colors.primary};
+//   margin-bottom: 1rem;
+// `;
 
-const PropertyFeatures = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-`;
+// const PropertyFeatures = styled.div`
+//   display: flex;
+//   flex-wrap: wrap;
+//   gap: 0.5rem;
+//   margin-bottom: 1rem;
+// `;
 
 const TestimonialCard = styled(Card)`
   text-align: center;
