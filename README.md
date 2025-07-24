@@ -1,6 +1,9 @@
 # Wild Welcome - Quick Start Guide
 
-A property rental platform for wildlife photographers and eco-tourists in Rwanda.
+Wild Welcome is a modern web-based platform in Rwanda designed to streamline the property rental process for both landlords and tenants.
+Deployment link: https://home-front-6npj.onrender.com/
+Video Demo:https://drive.google.com/file/d/15qFBp4ooMpXZUyTi_eBRpfwjuMS_Lakc/view?usp=sharing
+Figma Mockup Design: https://www.figma.com/design/p1X8TguvtYB7TzBJToymXc/Booking-Platform-Desktop-Design--Community-?node-id=2507-8904&t=cHorqY7HcAlrcjqJ-1
 
 ## Quick Start (Recommended)
 
