@@ -36,6 +36,12 @@ async def update_user_profile(
     
     # Get updated user
     updated_user = await db.users.find_one({"_id": ObjectId(current_user.id)})
+    
+    # Convert MongoDB document to User model format
+    if updated_user.get("_id"):
+        updated_user["id"] = str(updated_user["_id"])
+        del updated_user["_id"]
+    
     return User(**updated_user)
 
 

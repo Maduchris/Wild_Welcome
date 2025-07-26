@@ -10,7 +10,50 @@ from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel
 
+class PaginatedBookingResponse(BaseModel):
+    items: List[BookingResponse]
+    total: int
+    page: int
+    per_page: int
+    total_pages: int
+
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
+
+
+@router.get("/debug/all")
+async def debug_get_all_bookings(
+    current_user: User = Depends(get_current_active_user),
+    db = Depends(get_database)
+):
+    """DEBUG: Get all bookings in database (temporary endpoint)"""
+    # Get all bookings
+    all_bookings = await db.bookings.find({}).to_list(None)
+    
+    # Get all users for reference
+    all_users = await db.users.find({}).to_list(None)
+    
+    result = {
+        "total_bookings": len(all_bookings),
+        "current_user_id": current_user.id,
+        "current_user_email": current_user.email,
+        "bookings": []
+    }
+    
+    for booking in all_bookings:
+        # Find user for this booking
+        user = next((u for u in all_users if u["_id"] == booking["user_id"]), None)
+        
+        result["bookings"].append({
+            "booking_id": str(booking["_id"]),
+            "user_id": str(booking["user_id"]),
+            "user_email": user["email"] if user else "Unknown",
+            "property_id": str(booking["property_id"]),
+            "status": booking["status"],
+            "created_at": booking["created_at"],
+            "matches_current_user": str(booking["user_id"]) == current_user.id
+        })
+    
+    return result
 
 
 @router.post("/", response_model=BookingResponse)
@@ -28,7 +71,20 @@ async def create_booking(
             detail="Property not found"
         )
     
-    # Check if property is available for those dates
+    # Check if user already has a pending or confirmed booking for this property
+    user_existing_booking = await db.bookings.find_one({
+        "property_id": ObjectId(booking_data.property_id),
+        "user_id": ObjectId(current_user.id),
+        "status": {"$in": ["pending", "confirmed"]}
+    })
+    
+    if user_existing_booking:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You already have a pending or confirmed booking for this property"
+        )
+    
+    # Check if property is available for those dates (from any user)
     existing_booking = await db.bookings.find_one({
         "property_id": ObjectId(booking_data.property_id),
         "status": {"$in": ["pending", "confirmed"]},
@@ -68,8 +124,13 @@ async def create_booking(
     booking_doc["created_at"] = datetime.utcnow()
     booking_doc["updated_at"] = datetime.utcnow()
     
+    print(f"DEBUG: Creating booking for user {current_user.id} ({current_user.email})")
+    print(f"DEBUG: Booking document user_id: {booking_doc['user_id']}")
+    print(f"DEBUG: Property ID: {booking_doc['property_id']}")
+    
     # Insert booking
     result = await db.bookings.insert_one(booking_doc)
+    print(f"DEBUG: Booking created with ID: {result.inserted_id}")
     
     # Get created booking with property and user details
     booking_response = await get_booking_with_details(result.inserted_id, db)
@@ -108,14 +169,19 @@ async def get_user_bookings(
     db = Depends(get_database)
 ):
     """Get user's bookings"""
+    print(f"DEBUG: Getting bookings for user {current_user.id} ({current_user.email})")
+    
     # Build filter query
     filter_query = {"user_id": ObjectId(current_user.id)}
+    print(f"DEBUG: Filter query: {filter_query}")
     
     if status_filter:
         filter_query["status"] = status_filter
+        print(f"DEBUG: Status filter applied: {status_filter}")
     
     # Get bookings
     bookings = await db.bookings.find(filter_query).skip(skip).limit(limit).to_list(None)
+    print(f"DEBUG: Found {len(bookings)} bookings for user")
     
     # Get bookings with details
     booking_responses = []
@@ -245,7 +311,7 @@ async def cancel_booking(
     return {"message": "Booking cancelled successfully"}
 
 
-@router.get("/landlord/requests", response_model=List[BookingResponse])
+@router.get("/landlord/requests", response_model=PaginatedBookingResponse)
 async def get_landlord_booking_requests(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
@@ -253,30 +319,111 @@ async def get_landlord_booking_requests(
     current_user: User = Depends(get_current_landlord),
     db = Depends(get_database)
 ):
-    """Get booking requests for landlord's properties"""
+    """Get booking requests for landlord's properties with pagination"""
+    print(f"DEBUG: Getting booking requests for landlord {current_user.id} ({current_user.email})")
+    
     # Get landlord's properties
     landlord_properties = await db.properties.find(
         {"landlord_id": ObjectId(current_user.id)}
     ).to_list(None)
     
     property_ids = [prop["_id"] for prop in landlord_properties]
+    print(f"DEBUG: Landlord has {len(landlord_properties)} properties with IDs: {property_ids}")
     
     # Build filter query
     filter_query = {"property_id": {"$in": property_ids}}
     
     if status_filter:
         filter_query["status"] = status_filter
+        
+    print(f"DEBUG: Filter query: {filter_query}")
     
-    # Get bookings
-    bookings = await db.bookings.find(filter_query).skip(skip).limit(limit).to_list(None)
+    # Get bookings sorted by creation date (newest first)
+    bookings = await db.bookings.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(None)
+    print(f"DEBUG: Found {len(bookings)} bookings for landlord after pagination")
     
-    # Get bookings with details
+    # Debug each booking
+    for i, booking in enumerate(bookings):
+        print(f"DEBUG: Booking {i+1}: ID={booking['_id']}, user_id={booking['user_id']}, property_id={booking['property_id']}, status={booking['status']}")
+    
+    # Optimize: Get all related data in bulk instead of individual queries
+    user_ids = list(set([booking["user_id"] for booking in bookings]))
+    property_ids = list(set([booking["property_id"] for booking in bookings]))
+    
+    print(f"DEBUG: Fetching bulk data for {len(user_ids)} users and {len(property_ids)} properties")
+    
+    # Fetch properties first to get landlord IDs
+    properties_cursor = db.properties.find({"_id": {"$in": property_ids}})
+    properties_list = await properties_cursor.to_list(None)
+    
+    # Add landlord IDs to user_ids for bulk fetch
+    landlord_ids = [prop["landlord_id"] for prop in properties_list if prop.get("landlord_id")]
+    all_user_ids = list(set(user_ids + landlord_ids))
+    
+    print(f"DEBUG: Total user IDs to fetch: {len(all_user_ids)} (including {len(landlord_ids)} landlords)")
+    
+    # Fetch all users (tenants + landlords) in bulk
+    users_cursor = db.users.find({"_id": {"$in": all_user_ids}})
+    users_list = await users_cursor.to_list(None)
+    
+    # Create lookup dictionaries for fast access
+    users_dict = {user["_id"]: user for user in users_list}
+    properties_dict = {prop["_id"]: prop for prop in properties_list}
+    
+    print(f"DEBUG: Loaded {len(users_dict)} users and {len(properties_dict)} properties")
+    
+    # Build booking responses efficiently
     booking_responses = []
     for booking in bookings:
-        booking_response = await get_booking_with_details(booking["_id"], db)
+        user_data = users_dict.get(booking["user_id"])
+        property_data = properties_dict.get(booking["property_id"])
+        
+        # Get landlord data if needed
+        landlord_data = None
+        if property_data and property_data.get("landlord_id"):
+            landlord_data = users_dict.get(property_data["landlord_id"])
+        
+        # Create response efficiently without additional DB calls
+        booking_response = BookingResponse(
+            id=str(booking["_id"]),
+            property_id=str(booking["property_id"]),
+            user_id=str(booking["user_id"]),
+            check_in=booking["check_in"],
+            check_out=booking["check_out"],
+            guests=booking["guests"],
+            total_price=booking["total_price"],
+            special_requests=booking.get("special_requests"),
+            status=booking["status"],
+            created_at=booking["created_at"],
+            updated_at=booking["updated_at"],
+            property_title=property_data["title"] if property_data else None,
+            property_location=property_data["location"]["address"] if property_data and property_data.get("location") else None,
+            user_name=f"{user_data['first_name']} {user_data['last_name']}" if user_data else None,
+            user_email=user_data["email"] if user_data else None,
+            user_phone=user_data.get("phone") if user_data else None,
+            landlord_name=f"{landlord_data['first_name']} {landlord_data['last_name']}" if landlord_data else None,
+            landlord_email=landlord_data["email"] if landlord_data else None
+        )
+        
         booking_responses.append(booking_response)
+        print(f"DEBUG: Added booking response: {booking_response.id} - {booking_response.user_name}")
     
-    return booking_responses
+    # Get total count for pagination
+    total_count = await db.bookings.count_documents(filter_query)
+    
+    # Calculate pagination metadata
+    current_page = (skip // limit) + 1
+    total_pages = (total_count + limit - 1) // limit  # Ceiling division
+    
+    print(f"DEBUG: Returning {len(booking_responses)} booking responses out of {total_count} total")
+    
+    return PaginatedBookingResponse(
+        items=booking_responses,
+        total=total_count,
+        page=current_page,
+        per_page=limit,
+        total_pages=total_pages
+    )
 
 
 class BookingApprovalRequest(BaseModel):
@@ -429,6 +576,7 @@ async def get_booking_with_details(booking_id: ObjectId, db) -> BookingResponse:
         property_location=property_data["location"]["address"] if property_data else None,
         user_name=f"{user_data['first_name']} {user_data['last_name']}" if user_data else None,
         user_email=user_data["email"] if user_data else None,
+        user_phone=user_data.get("phone") if user_data else None,
         landlord_name=f"{landlord_data['first_name']} {landlord_data['last_name']}" if landlord_data else None,
         landlord_email=landlord_data["email"] if landlord_data else None
     )

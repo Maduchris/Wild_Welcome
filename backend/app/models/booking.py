@@ -70,5 +70,6 @@ class BookingResponse(BaseModel):
     property_location: Optional[str] = None
     user_name: Optional[str] = None
     user_email: Optional[str] = None
+    user_phone: Optional[str] = None
     landlord_name: Optional[str] = None
     landlord_email: Optional[str] = None

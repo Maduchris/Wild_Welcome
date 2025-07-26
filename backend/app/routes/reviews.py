@@ -15,6 +15,8 @@ async def get_reviews(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     property_id: Optional[str] = Query(None),
+    booking_id: Optional[str] = Query(None),
+    stage: Optional[str] = Query(None),
     featured_only: bool = Query(False),
     approved_only: bool = Query(True),
     db = Depends(get_database)
@@ -27,6 +29,12 @@ async def get_reviews(
     
     if featured_only:
         filter_query["is_featured"] = True
+    
+    if booking_id:
+        filter_query["booking_id"] = booking_id
+    
+    if stage:
+        filter_query["stage"] = stage
     
     if property_id:
         if property_id == "platform":
@@ -79,17 +87,43 @@ async def create_review(
     db = Depends(get_database)
 ):
     """Create a new review"""
-    # Check if user already reviewed this property
-    existing_review = await db.reviews.find_one({
-        "user_id": current_user.id,
-        "property_id": review_data.property_id
-    })
+    # For booking stage reviews, check if user already reviewed this booking stage
+    if review_data.booking_id and review_data.stage:
+        existing_review = await db.reviews.find_one({
+            "user_id": current_user.id,
+            "booking_id": review_data.booking_id,
+            "stage": review_data.stage
+        })
+        
+        if existing_review:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"You have already reviewed the {review_data.stage_title or review_data.stage} stage for this booking"
+            )
+        
+        # Verify the booking belongs to the user
+        booking_exists = await db.bookings.find_one({
+            "_id": ObjectId(review_data.booking_id),
+            "user_id": ObjectId(current_user.id)
+        })
+        if not booking_exists:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Booking not found or not owned by you"
+            )
     
-    if existing_review:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You have already reviewed this property"
-        )
+    # For property reviews, check if user already reviewed this property
+    elif review_data.property_id:
+        existing_review = await db.reviews.find_one({
+            "user_id": current_user.id,
+            "property_id": review_data.property_id
+        })
+        
+        if existing_review:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="You have already reviewed this property"
+            )
     
     # If reviewing a specific property, verify it exists
     if review_data.property_id:
@@ -106,7 +140,7 @@ async def create_review(
     review_doc["user_name"] = f"{current_user.first_name} {current_user.last_name[0]}."  # e.g., "John D."
     review_doc["created_at"] = datetime.utcnow()
     review_doc["updated_at"] = datetime.utcnow()
-    review_doc["is_approved"] = False  # Reviews need approval
+    review_doc["is_approved"] = True  # Auto-approve reviews for immediate display
     
     # Insert review
     result = await db.reviews.insert_one(review_doc)
